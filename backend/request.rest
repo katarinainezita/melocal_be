@@ -1,0 +1,202 @@
+
+// Create Partners
+POST http://localhost:5000/partners
+Content-Type: application/json
+
+{
+    "nama" : "Hanun Shaka",
+    "email": "hanunshaka02@gmail.com",
+    "no_telp": "085156961624",
+	"password": "Aainoene83",
+    "confPassword": "Aainoene83",
+    "alamat": "Jalan Tomat Surabaya"
+}
+
+###
+// Get All Partners
+GET http://localhost:5000/partners
+
+###
+// Get Single Partners
+GET http://localhost:5000/partners/1
+
+###
+// Update Partner
+PATCH http://localhost:5000/partners/1
+Content-Type: application/json
+
+{
+    "nama" : "Hanun Shaka Update",
+    "email": "hanunshaka02@gmail.com",
+    "no_telp": "085156961624",
+	"password": "",
+    "confPassword": "",
+    "alamat": "Jalan Tomat Surabaya"
+}
+
+###
+// Delete Partner
+DELETE  http://localhost:5000/partners/1
+
+
+
+###
+// Create Users
+POST http://localhost:5000/users
+Content-Type: application/json
+
+{
+    "nama" : "Katarina Inezita",
+    "email": "inezitakatarina16@gmail.com",
+    "no_telp": "085156961625",
+	"password": "Aai94i",
+    "confPassword": "Aai94i",
+    "alamat": "Jalan Tomat Surabaya",
+    "role": "user"
+}
+
+# {
+#     "nama" : "Hanun Shaka Update",
+#     "email": "hanunshaka02@gmail.com",
+#     "no_telp": "085156961624",
+# 	"password": "Aai94i94oene83",
+#     "confPassword": "Aai94i94oene83",
+#     "alamat": "Jalan TWortel Surabaya",
+#     "role": "admin"
+# }
+
+###
+// Get All Users
+GET http://localhost:5000/users
+
+###
+// Get Single Users
+GET http://localhost:5000/users/1
+
+###
+// Update Users
+PATCH http://localhost:5000/users/1
+Content-Type: application/json
+
+{
+    "nama" : "Katarina Inezita Update",
+    "email": "inezitakatarina16@gmail.com",
+    "no_telp": "085156961625",
+	"password": "",
+    "confPassword": ""
+}
+
+###
+// Delete USer
+DELETE  http://localhost:5000/users/2
+
+
+###
+// Login Users
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "inezitakatarina16@gmail.com",
+    "password": "Aai94i"
+}
+
+###
+// Login Partners
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "hanunshaka02@gmail.com",
+    "password": "Aai94i94oene83"
+}
+
+
+// Problem : kalau yang login partner, blom bisa nampilin data partner
+// Tapi kalau user yang login, udah bisa nampilin data user
+###
+GET http://localhost:5000/me
+
+// Logout Users
+###
+DELETE http://localhost:5000/logout
+
+// Get All Activities
+###
+GET http://localhost:5000/activities
+
+
+// Create Activity
+###
+POST http://localhost:5000/activities
+Content-Type: application/json
+
+# {
+#     "nama": "Strolling at Kota Lama Semarang",
+#     "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+#     "harga": "1000",
+#     "fitur": "  Mengenal sudut Kota Lama Semarang",
+#     "bintang": "4",
+#     "lokasi": "Semarang",
+#     "kontak_pengelola": "089264829202"
+
+# }
+
+# {
+#     "nama": "Alun Alun Surabaya",
+#     "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+#     "harga": "2000",
+#     "fitur": "  Mengenal Surabaya",
+#     "bintang": "3",
+#     "lokasi": "Surabaya",
+#     "kontak_pengelola": "087352839473"
+
+# }
+
+# {
+#     "nama": "Rawon Setan",
+#     "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+#     "harga": "10000",
+#     "fitur": "  Mengenal Kuliner Rawon",
+#     "bintang": "5",
+#     "lokasi": "Sidoarjo",
+#     "kontak_pengelola": "086537292736"
+
+# }
+
+{
+    "nama": "Kupang Lontong",
+    "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "harga": "5000",
+    "fitur": "  Mengenal Kuliner Kupang",
+    "bintang": "3",
+    "lokasi": "Sidoarjo",
+    "kontak_pengelola": "086748393336"
+
+}
+
+// Get Single Activity
+###
+GET http://localhost:5000/activities/4
+
+
+// Update Activity
+###
+PATCH http://localhost:5000/activities/4
+Content-Type: application/json
+
+{
+    "nama": "Kupang Lontong Updated",
+    "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    "harga": "5000",
+    "fitur": "  Mengenal Kuliner Kupang",
+    "bintang": "3",
+    "lokasi": "Sidoarjo",
+    "kontak_pengelola": "086748393336"
+
+}
+
+
+// Delete Activity
+###
+DELETE  http://localhost:5000/activities/1
