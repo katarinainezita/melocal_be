@@ -47,13 +47,20 @@ const Activities = db.define('activities', {
             notEmpty: true,
         }
     },
-    kontak_pengelola:{
+    nama_tourguide: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            notEmpty: true,
+          notEmpty: true
         }
     },
+    kontak_tourguide: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate:{
+          is: /^[0-9]+$/
+        }
+    }
 }, {
     freezeTableName: true
 });

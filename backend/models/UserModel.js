@@ -23,26 +23,21 @@ const Users = db.define('users', {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            notEmpty: true
+            notEmpty: true,
+            is: /^[0-9]+$/
         }
     },
     password:{
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            notEmpty: true
+            notEmpty: true,
         }
     },
     melocal_points:{
         type: DataTypes.INTEGER,
         allowNull: false,
-        validate: {
-            notEmpty: true
-        }
-    },
-    alamat:{
-        type: DataTypes.STRING,
-        allowNull: false,
+        defaultValue: 0,
         validate: {
             notEmpty: true
         }
@@ -50,6 +45,7 @@ const Users = db.define('users', {
     role:{
         type: DataTypes.STRING,
         allowNull: false,
+        defaultValue: "user",
         validate: {
             notEmpty: true
         }

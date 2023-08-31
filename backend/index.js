@@ -5,6 +5,12 @@ import dotenv from "dotenv";
 import UserRoute from "./routes/UserRoute.js";
 import ActivityRoute from "./routes/ActivityRoute.js";
 import AuthRoute from "./routes/AuthRoute.js";
+import TransactionRoute from "./routes/TransactionRoute.js"
+import SesiRoute from "./routes/SesiRoute.js";
+import ImageRoute from "./routes/ImageRoute.js";
+import CartRoute from "./routes/CartRoute.js";
+import DetailRoute from "./routes/Detail_transactionRoute.js"
+
 import SequelizeStore from "connect-session-sequelize";
 import db from "./config/Database.js";
 dotenv.config();
@@ -41,6 +47,11 @@ app.use(express.json());
 app.use(UserRoute);
 app.use(ActivityRoute);
 app.use(AuthRoute);
+app.use(TransactionRoute);
+app.use(SesiRoute);
+app.use(ImageRoute);
+app.use(CartRoute);
+app.use(DetailRoute);
 
 // store.sync();
 

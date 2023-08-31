@@ -1,12 +1,13 @@
-import Activities from "../models/ActivityModel.js";
+import Reviews from "../models/ReviewModel.js";
 import Users from "../models/UserModel.js";
+import Activities from "../models/ActivityModel.js";
 import { Op } from "sequelize";
 
-export const getActivities = async(req, res) => {
+export const getReviews = async(req, res) => {
     try {
         let response;
         if(req.role === "admin"){
-            response = await Activities.findAll({
+            response = await Reviews.findAll({
                 attributes:['id', 'nama', 'deskripsi', 'harga', 'fitur', 'bintang', 'lokasi', 'nama_tourguide', 'kontak_tourguide'],
                 include:[{
                     model: Users, 
@@ -152,35 +153,3 @@ export const deleteActivity = async(req, res) => {
         res.status(500).json({msg: error.message});
     }
 }
-
-// export const panigationActivity = async(req, res) => {
-//     const page = Number.parseInt(req.query.page);
-//     const size = Number.parseInt(req.query.size);
-    
-//     try {
-//         const activity = await Activities.findAndCountAll({
-//             limit: size,
-//             offset: (page-1) * size,
-            
-//         })
-//         if(!activity) return res.status(404).json({msg: "Data tidak ditemukan"});
-//         const { nama, deskripsi, harga, fitur, bintang, lokasi, kontak_pengelola} = req.body;
-//         if(req.role === "admin"){
-//             await Activities.destroy({
-//                 where:{
-//                     id: activity.id
-//                 }
-//             });
-//         } else {
-//             if(req.userId !== activity.userId) return res.status(403).json({msg: "Akses terlarang"});
-//             await Activities.destroy({
-//                 where:{
-//                     [Op.and]:[{id: activity.id}, {userId: req.userId}]   
-//                 }
-//             });
-//         }
-//         res.status(200).json({msg: "Product Deleted Successfully"});
-//     } catch (error) {
-//         res.status(500).json({msg: error.message});
-//     }
-// }

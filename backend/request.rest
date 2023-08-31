@@ -1,42 +1,43 @@
 
-// Create Partners
-POST http://localhost:5000/partners
-Content-Type: application/json
+# // Create Partners
+# POST http://localhost:5000/users
+# Content-Type: application/json
 
-{
-    "nama" : "Hanun Shaka",
-    "email": "hanunshaka02@gmail.com",
-    "no_telp": "085156961624",
-	"password": "Aainoene83",
-    "confPassword": "Aainoene83",
-    "alamat": "Jalan Tomat Surabaya"
-}
+# {
+#     "nama" : "Hanun Shaka",
+#     "email": "hanunshaka02@gmail.com",
+#     "no_telp": "085156961624",
+# 	"password": "Aainoene83",
+#     "confPassword": "Aainoene83"
+# }
 
-###
-// Get All Partners
-GET http://localhost:5000/partners
+# ###
+# // Get All Partners
+# GET http://localhost:5000/partners
 
-###
-// Get Single Partners
-GET http://localhost:5000/partners/1
+# ###
+# // Get Single Partners
+# GET http://localhost:5000/partners/1
 
-###
-// Update Partner
-PATCH http://localhost:5000/partners/1
-Content-Type: application/json
+# ###
+# // Update Partner
+# PATCH http://localhost:5000/partners/1
+# Content-Type: application/json
 
-{
-    "nama" : "Hanun Shaka Update",
-    "email": "hanunshaka02@gmail.com",
-    "no_telp": "085156961624",
-	"password": "",
-    "confPassword": "",
-    "alamat": "Jalan Tomat Surabaya"
-}
+# {
+#     "nama" : "Hanun Shaka Update",
+#     "email": "hanunshaka02@gmail.com",
+#     "no_telp": "085156961624",
+# 	"password": "",
+#     "confPassword": "",
+#     "alamat": "Jalan Tomat Surabaya"
+# }
 
-###
-// Delete Partner
-DELETE  http://localhost:5000/partners/1
+# ###
+# // Delete Partner
+# DELETE  http://localhost:5000/partners/1
+
+
 
 
 
@@ -50,9 +51,7 @@ Content-Type: application/json
     "email": "inezitakatarina16@gmail.com",
     "no_telp": "085156961625",
 	"password": "Aai94i",
-    "confPassword": "Aai94i",
-    "alamat": "Jalan Tomat Surabaya",
-    "role": "user"
+    "confPassword": "Aai94i"
 }
 
 # {
@@ -61,7 +60,6 @@ Content-Type: application/json
 #     "no_telp": "085156961624",
 # 	"password": "Aai94i94oene83",
 #     "confPassword": "Aai94i94oene83",
-#     "alamat": "Jalan TWortel Surabaya",
 #     "role": "admin"
 # }
 
@@ -71,7 +69,7 @@ GET http://localhost:5000/users
 
 ###
 // Get Single Users
-GET http://localhost:5000/users/1
+GET http://localhost:5000/users/3
 
 ###
 // Update Users
@@ -87,8 +85,9 @@ Content-Type: application/json
 }
 
 ###
-// Delete USer
-DELETE  http://localhost:5000/users/2
+// Delete User
+DELETE  http://localhost:5000/users/1
+
 
 
 ###
@@ -111,15 +110,14 @@ Content-Type: application/json
     "password": "Aai94i94oene83"
 }
 
-
-// Problem : kalau yang login partner, blom bisa nampilin data partner
-// Tapi kalau user yang login, udah bisa nampilin data user
+// Tampilin siapa yg lagi login
 ###
 GET http://localhost:5000/me
 
 // Logout Users
 ###
 DELETE http://localhost:5000/logout
+
 
 // Get All Activities
 ###
@@ -153,36 +151,38 @@ Content-Type: application/json
 
 # }
 
-# {
-#     "nama": "Rawon Setan",
-#     "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-#     "harga": "10000",
-#     "fitur": "  Mengenal Kuliner Rawon",
-#     "bintang": "5",
-#     "lokasi": "Sidoarjo",
-#     "kontak_pengelola": "086537292736"
-
-# }
-
 {
-    "nama": "Kupang Lontong",
+    "nama": "Rawon Setan",
     "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    "harga": "5000",
-    "fitur": "  Mengenal Kuliner Kupang",
-    "bintang": "3",
+    "harga": "10000",
+    "fitur": "  Mengenal Kuliner Rawon",
+    "bintang": "5",
     "lokasi": "Sidoarjo",
-    "kontak_pengelola": "086748393336"
+    "nama_tourguide": "Sujono",
+    "kontak_tourguide": "086537292736"
 
 }
 
+# {
+#     "nama": "Alun Alun Surabaya",
+#     "deskripsi": "Lorem ipsum dolor",
+#     "harga": "50000",
+#     "fitur": "Mengenal Surabaya",
+#     "bintang": "5",
+#     "lokasi": "Surabaya",
+#     "nama_tourguide": "Siska Uri",
+#     "kontak_tourguide": "087352839473"
+
+# }
+
 // Get Single Activity
 ###
-GET http://localhost:5000/activities/4
+GET http://localhost:5000/activities/3
 
 
 // Update Activity
 ###
-PATCH http://localhost:5000/activities/4
+PATCH http://localhost:5000/activities/3
 Content-Type: application/json
 
 {
@@ -192,11 +192,155 @@ Content-Type: application/json
     "fitur": "  Mengenal Kuliner Kupang",
     "bintang": "3",
     "lokasi": "Sidoarjo",
-    "kontak_pengelola": "086748393336"
+    "nama_tourguide" : "Sujono",
+    "kontak_tourguide": "086537292736"
 
 }
 
 
 // Delete Activity
 ###
-DELETE  http://localhost:5000/activities/1
+DELETE  http://localhost:5000/activities/3
+
+
+
+// Get All Transaction
+###
+GET http://localhost:5000/transactions
+
+
+// Create Transaction
+###
+POST http://localhost:5000/transactions
+Content-Type: application/json
+
+{
+    "metode_pembayaran": "transfer",
+    "harga_total": "50000",
+    "status": "menunggu pembayaran"
+}
+
+// Update Transaction
+###
+PATCH http://localhost:5000/transactions/1
+Content-Type: application/json
+
+{
+    "metode_pembayaran": "transfer",
+    "harga_total": "50000",
+    "status": "batal"
+}
+
+// Delete Transaction
+###
+DELETE http://localhost:5000/transactions/1
+
+// Create Transaction
+###
+POST http://localhost:5000/sesis/1
+Content-Type: application/json
+
+{
+    "nama": "sesi 5",
+    "tanggal": "2023-11-2",
+    "mulai": "07:00",
+    "selesai": "17:00",
+    "slot_maks": "10",
+    "slot_booked": "5"
+}
+
+
+// Get Sesi By Activity Id
+###
+GET http://localhost:5000/sesis/1
+
+// Update
+###
+PUT http://localhost:5000/sesis/2
+Content-Type: application/json
+
+{
+    "nama": "sesi 3",
+    "tanggal": "13-11-2023",
+    "mulai": "07:00",
+    "selesai": "17:00",
+    "slot_maks": "10",
+    "slot_booked": "5"
+}
+
+###
+DELETE http://localhost:5000/sesis/2
+
+
+// Create Images
+###
+POST http://localhost:5000/images/1
+Content-Type: application/json
+
+# {
+#     "nama": "gambar 1",
+#     "url": "https://i.pinimg.com/originals/8e/6e/f4/8e6ef47115093685498e84a4db41f736.jpg"
+# }
+
+{
+    "nama": "gambar 2",
+    "url": "https://i.pinimg.com/originals/8e/6e/f4/8e6ef47115093685498e84a4db41f736.jpg"
+}
+
+// Get Images By Activity Id
+###
+GET http://localhost:5000/images/1
+
+// Update Image By Id
+###
+PUT http://localhost:5000/images/1
+Content-Type: application/json
+
+{
+    "nama": "gambar 1 update",
+    "url":"https://i.pinimg.com/originals/8e/6e/f4/8e6ef47115093685498e84a4db41f736.jpg"
+}
+
+
+###
+DELETE http://localhost:5000/images/2
+
+
+// Create Cart
+###
+POST http://localhost:5000/carts/4
+Content-Type: application/json
+
+// Get Cart
+###
+GET http://localhost:5000/carts
+
+// Delete Cart
+###
+DELETE http://localhost:5000/carts/1
+
+// Create Detail
+###
+POST http://localhost:5000/details/2/3
+Content-Type: application/json
+
+{
+    "jumlah": "3"
+}
+
+// Get Detail
+###
+GET http://localhost:5000/details/2
+
+// Update Detail
+###
+PUT http://localhost:5000/details/1
+Content-Type: application/json
+
+{
+    "jumlah": "1"
+}
+
+// Delete Detail
+###
+DELETE http://localhost:5000/details/1

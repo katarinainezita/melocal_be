@@ -5,7 +5,7 @@ import argon2 from "argon2";
 export const getUsers = async(req, res) => {
     try {
         const response = await Users.findAll({
-            attributes:['id', 'nama', 'email', 'no_telp', 'melocal_points', 'alamat', 'role']
+            attributes:['id', 'nama', 'email', 'no_telp', 'melocal_points', 'role']
         });
         res.status(200).json(response);
     } catch (error) {
@@ -19,7 +19,7 @@ export const getUsers = async(req, res) => {
 export const getUserById = async(req, res) => {
     try {
         const response = await Users.findOne({
-            attributes:['id', 'nama', 'email', 'no_telp', 'melocal_points','alamat', 'role'],            
+            attributes:['id', 'nama', 'email', 'no_telp', 'melocal_points','role'],            
             where: {
                 id : req.params.id
             }
@@ -33,8 +33,25 @@ export const getUserById = async(req, res) => {
     }
 }
 
+export const getUserByEmail = async(req, res) => {
+    try {
+        const response = await Users.findOne({
+            attributes:['id', 'nama', 'email', 'no_telp', 'melocal_points', 'role'],            
+            where: {
+                email : req.params.email
+            }
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({
+            msg: error.message
+        });
+        
+    }
+}
+
 export const createUser = async(req, res) => {
-    const {nama, email, no_telp, password, confPassword, alamat, role} = req.body;
+    const {nama, email, no_telp, password, confPassword, role} = req.body;
     if(password !== confPassword) return res.status(400).json({msg: "Password dan Confirm Password tidak cocok"})
     const hashPassword = await argon2.hash(password);
     try {
@@ -44,7 +61,6 @@ export const createUser = async(req, res) => {
             no_telp: no_telp,
             password: hashPassword,
             melocal_points: 0,
-            alamat: alamat,
             role: role
         });
         res.status(201).json({msg: "Register Berhasil"});
@@ -62,7 +78,7 @@ export const updateUser = async(req, res) => {
             }
     });
     if(!user) return res.status(404).json({msg: "User tidak ditemukan"});
-    const {nama, email, no_telp, password, confPassword, alamat, role} = req.body;
+    const {nama, email, no_telp, password, confPassword, melocal_points, role} = req.body;
     let hashPassword;
     if(password === "" || password === null){
         hashPassword = user.password
@@ -76,8 +92,7 @@ export const updateUser = async(req, res) => {
             email: email,
             no_telp: no_telp,
             password: hashPassword,
-            melocal_points: 0,
-            alamat: alamat,
+            melocal_points: melocal_points, 
             role: role
         }, {
             where:{
