@@ -1,8 +1,10 @@
 import Transactions from "../models/TransactionModel.js";
 import Users from "../models/UserModel.js";
-import { Op } from "sequelize";
+import Sesis from "../models/SesiModel.js";
+import { Op, Sequelize } from "sequelize";
 
 export const getTransactions = async(req, res) => {
+    const {userId} = req.params;
     try {
         let response;
         if(req.role === "admin"){
@@ -14,15 +16,32 @@ export const getTransactions = async(req, res) => {
                 }]
             });
         } else {
-            response = await Transactions.findAll({
-                attributes:['id', 'waktu', 'metode_pembayaran', 'harga_total', 'status'],
-                where:{
-                    userId: req.userId
-                },
-                include:[{
-                    model: Users,
-                    attributes:['nama','email']
-                }]
+            // response = await Transactions.findAll({
+            //     attributes:['id', 'waktu', 'metode_pembayaran', 'harga_total', 'status'],
+            //     where:{
+            //         userId: userId
+            //     },
+            //     include:[{
+            //         model: Users,
+            //         attributes:['nama','email']
+            //     }]
+            // });
+            const sequelize = new Sequelize('melocaldb', 'root', '', {
+                host: "localhost",
+                dialect: "mysql"
+            });
+
+            const query = `
+                SELECT transactions.id, transactions.waktu, transactions.metode_pembayaran, transactions.harga_total,
+                transactions.status, transactions.slot_dibeli, sesis.nama AS sesi_nama, sesis.tanggal, sesis.slot_booked,
+                activities.nama, activities.harga, activities.lokasi FROM transactions JOIN sesis
+                ON transactions.sesisId = sesis.id JOIN activities ON sesis.activityId = activities.id
+                WHERE transactions.userId = ${userId}
+            `;
+
+            response = await sequelize.query(query, {
+                replacements: { userId }, // Pass userId as a replacement to prevent SQL injection
+                type: Sequelize.QueryTypes.SELECT // Specify the query type
             });
         }
         res.status(200).json(response);
@@ -70,16 +89,62 @@ export const getTransactionById = async(req, res) => {
     }
 }
 
+export const getPendingTransactions = async(req, res) => {
+    const { userId } = req.params;
+    try {
+        const sequelize = new Sequelize('melocaldb', 'root', '', {
+            host: "localhost",
+            dialect: "mysql"
+        });
+
+        const query = `
+            SELECT transactions.id AS id_tr, transactions.waktu, transactions.status, transactions.slot_dibeli, sesis.id AS id_sesi,
+            sesis.nama AS nama_sesi, sesis.tanggal AS tanggal_sesi, sesis.slot_maks, sesis.slot_booked, activities.nama,
+            activities.harga, activities.lokasi FROM transactions JOIN sesis ON
+            transactions.sesisId = sesis.id JOIN activities ON sesis.activityId = activities.id
+            WHERE transactions.status LIKE 'menunggu verifikasi' AND activities.userId = ${userId}
+        `;
+
+        let response = await sequelize.query(query, {
+            replacements: { userId }, // Pass userId as a replacement to prevent SQL injection
+            type: Sequelize.QueryTypes.SELECT // Specify the query type
+        });
+
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({msg: error.message});
+    }
+}
+
 export const createTransaction = async(req, res) => {
-    const {metode_pembayaran, harga_total, status} = req.body;
+    const {metode_pembayaran, harga_total, slot_dibeli, sesisId} = req.body;
+    const { userId } = req.params;
     try {
         await Transactions.create({
             metode_pembayaran: metode_pembayaran,
             harga_total: harga_total,
-            status: status,
-            userId: req.userId
+            status: 'menunggu verifikasi',
+            sesisId: sesisId,
+            slot_dibeli: slot_dibeli,
+            userId: userId
         });
         res.status(201).json({msg: "Transaction Created Successfully"})
+    } catch (error) {
+        res.status(500).json({msg: error.message});
+    }
+}
+
+export const updateVerifyTransaction = async(req, res) => {
+    const { id } = req.params;
+    try {
+        await Transactions.update({
+            status: 'terverifikasi'
+        },{
+            where:{
+                id: id
+            }
+        });
+        res.status(200).json({msg: "Transaction Updated Successfully"})
     } catch (error) {
         res.status(500).json({msg: error.message});
     }
@@ -114,6 +179,22 @@ export const updateTransaction = async(req, res) => {
             });
         }
         res.status(200).json({msg: "Product Updated Successfully"});
+    } catch (error) {
+        res.status(500).json({msg: error.message});
+    }
+}
+
+export const updateDenyTransaction = async(req, res) => {
+    const { id } = req.params;
+    try {
+        await Transactions.update({
+            status: 'batal'
+        },{
+            where:{
+                id: id
+            }
+        });
+        res.status(200).json({msg: "Transaction Updated Successfully"})
     } catch (error) {
         res.status(500).json({msg: error.message});
     }

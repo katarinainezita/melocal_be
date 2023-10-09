@@ -4,6 +4,7 @@ import {
     getSesiById,
     createSesi,
     updateSesi,
+    updateSesiSlot,
     deleteSesi
 } from "../controllers/Sesi.js";
 
@@ -18,6 +19,7 @@ const router = express.Router();
 router.get('/sesis/:activityId', getSesiById);
 router.post('/sesis/:activityId', createSesi);
 router.put('/sesis/:id', updateSesi);
+router.patch('/sesis/:id', updateSesiSlot);
 router.delete('/sesis/:id', deleteSesi);
 
 export default router;

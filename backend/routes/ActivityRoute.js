@@ -13,10 +13,10 @@ import { verifyUser } from "../middleware/AuthUser.js";
 
 const router = express.Router();
 
-router.get('/activities', verifyUser, getActivities);
-router.get('/activities/:id', verifyUser, getActivityById);
-router.post('/activities', verifyUser, createActivity);
-router.patch('/activities/:id', verifyUser, updateActivity);
-router.delete('/activities/:id', verifyUser, deleteActivity);
+router.get('/activities', getActivities);
+router.get('/activities/:userId', getActivityById);
+router.post('/activities/:userId', createActivity);
+router.patch('/activities/:id', updateActivity);
+router.delete('/activities/:id', deleteActivity);
 
 export default router;

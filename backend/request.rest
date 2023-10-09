@@ -54,6 +54,19 @@ Content-Type: application/json
     "confPassword": "Aai94i"
 }
 
+###
+// Create User Mitra
+POST http://localhost:5000/usermitra
+Content-Type: application/json
+
+{
+    "nama" : "Naufalqi",
+    "email": "naufalqinaufalqi@gmail.com",
+    "no_telp": "085156961625",
+	"password": "Naufalqii02",
+    "confPassword": "Naufalqii02"
+}
+
 # {
 #     "nama" : "Hanun Shaka Update",
 #     "email": "hanunshaka02@gmail.com",
@@ -69,7 +82,7 @@ GET http://localhost:5000/users
 
 ###
 // Get Single Users
-GET http://localhost:5000/users/3
+GET http://localhost:5000/users/2
 
 ###
 // Update Users
@@ -126,7 +139,7 @@ GET http://localhost:5000/activities
 
 // Create Activity
 ###
-POST http://localhost:5000/activities
+POST http://localhost:5000/activities/2
 Content-Type: application/json
 
 # {
@@ -147,21 +160,33 @@ Content-Type: application/json
 #     "fitur": "  Mengenal Surabaya",
 #     "bintang": "3",
 #     "lokasi": "Surabaya",
-#     "kontak_pengelola": "087352839473"
-
+#     "nama_tourguide": "Ojan",
+#     "kontak_tourguide": "087352839473",
+#     "userId": 3
 # }
 
 {
-    "nama": "Rawon Setan",
-    "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    "harga": "10000",
-    "fitur": "  Mengenal Kuliner Rawon",
+    "nama": "Berkebun di Kebun Raya Purwodadi",
+    "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "harga": "5000",
+    "fitur": "  Mengenal Kebun Raya Purwodadi",
     "bintang": "5",
-    "lokasi": "Sidoarjo",
-    "nama_tourguide": "Sujono",
-    "kontak_tourguide": "086537292736"
-
+    "lokasi": "Purwodadi",
+    "nama_tourguide": "Ojan",
+    "kontak_tourguide": "087352839473"
 }
+
+# {
+#     "nama": "Rawon Setan",
+#     "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+#     "harga": "10000",
+#     "fitur": "  Mengenal Kuliner Rawon",
+#     "bintang": "5",
+#     "lokasi": "Sidoarjo",
+#     "nama_tourguide": "Sujono",
+#     "kontak_tourguide": "086537292736"
+
+# }
 
 # {
 #     "nama": "Alun Alun Surabaya",
@@ -177,7 +202,7 @@ Content-Type: application/json
 
 // Get Single Activity
 ###
-GET http://localhost:5000/activities/3
+GET http://localhost:5000/activities/2
 
 
 // Update Activity
@@ -186,7 +211,7 @@ PATCH http://localhost:5000/activities/3
 Content-Type: application/json
 
 {
-    "nama": "Kupang Lontong Updated",
+    "nama": "Snorkeling Surabaya",
     "deskripsi": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     "harga": "5000",
     "fitur": "  Mengenal Kuliner Kupang",
@@ -206,18 +231,25 @@ DELETE  http://localhost:5000/activities/3
 
 // Get All Transaction
 ###
-GET http://localhost:5000/transactions
+GET http://localhost:5000/transactions/1
+
+
+// Get pending transaction
+###
+GET http://localhost:5000/pending_transactions/2
 
 
 // Create Transaction
 ###
-POST http://localhost:5000/transactions
+POST http://localhost:5000/transactions/1
 Content-Type: application/json
 
 {
     "metode_pembayaran": "transfer",
     "harga_total": "50000",
-    "status": "menunggu pembayaran"
+    "status": "menunggu verifikasi",
+    "sesisId": 1,
+    "slot_dibeli": 2
 }
 
 // Update Transaction
@@ -235,15 +267,15 @@ Content-Type: application/json
 ###
 DELETE http://localhost:5000/transactions/1
 
-// Create Transaction
+// Create Sesi
 ###
 POST http://localhost:5000/sesis/1
 Content-Type: application/json
 
 {
-    "nama": "sesi 5",
+    "nama": "sesi 1",
     "tanggal": "2023-11-2",
-    "mulai": "07:00",
+    "mulai": "15:00",
     "selesai": "17:00",
     "slot_maks": "10",
     "slot_booked": "5"
@@ -308,7 +340,7 @@ DELETE http://localhost:5000/images/2
 
 // Create Cart
 ###
-POST http://localhost:5000/carts/4
+POST http://localhost:5000/carts/1
 Content-Type: application/json
 
 // Get Cart
@@ -321,7 +353,7 @@ DELETE http://localhost:5000/carts/1
 
 // Create Detail
 ###
-POST http://localhost:5000/details/2/3
+POST http://localhost:5000/details/1
 Content-Type: application/json
 
 {
@@ -330,7 +362,7 @@ Content-Type: application/json
 
 // Get Detail
 ###
-GET http://localhost:5000/details/2
+GET http://localhost:5000/details/1
 
 // Update Detail
 ###

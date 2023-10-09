@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import db from "../config/Database.js";
 import Users from "./UserModel.js";
+import Sesi from "./SesiModel.js";
 
 const {DataTypes} = Sequelize;
 
@@ -11,12 +12,16 @@ const Transactions = db.define('transactions', {
     },
     metode_pembayaran: DataTypes.ENUM(['ovo', 'gopay', 'dana', 'shopeepay', 'transfer']),
     harga_total: DataTypes.INTEGER,
-    status: DataTypes.ENUM(['menunggu pembayaran', 'akan datang', 'telah selesai', 'batal'])
+    status: DataTypes.ENUM(['menunggu pembayaran', 'menunggu verifikasi', 'terverifikasi', 'telah selesai', 'batal']),
+    bukti_pembayaran: DataTypes.STRING,
+    slot_dibeli: DataTypes.INTEGER
 }, {
     freezeTableName: true
 });
 
 Users.hasMany(Transactions);
-Transactions.belongsTo(Users)
+Sesi.hasMany(Transactions);
+Transactions.belongsTo(Users);
+Transactions.belongsTo(Sesi);
 
 export default Transactions;

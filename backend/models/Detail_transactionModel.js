@@ -17,4 +17,4 @@ Detail_transactions.belongsTo(Transactions);
 Sesis.hasMany(Detail_transactions)
 Detail_transactions.belongsTo(Sesis)
 
-export default Detail_transactions;
+// export default Detail_transactions;
