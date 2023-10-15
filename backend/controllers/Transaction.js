@@ -2,6 +2,10 @@ import Transactions from "../models/TransactionModel.js";
 import Users from "../models/UserModel.js";
 import Sesis from "../models/SesiModel.js";
 import { Op, Sequelize } from "sequelize";
+import fetch from 'node-fetch';
+import nodemailer from 'nodemailer';
+import { google } from "googleapis";
+
 
 export const getTransactions = async(req, res) => {
     const {userId} = req.params;
@@ -119,17 +123,67 @@ export const getPendingTransactions = async(req, res) => {
 export const createTransaction = async(req, res) => {
     const {metode_pembayaran, harga_total, slot_dibeli, sesisId} = req.body;
     const { userId } = req.params;
+    console.log(req.body);
     try {
-        await Transactions.create({
+        const transaction = await Transactions.create({
             metode_pembayaran: metode_pembayaran,
             harga_total: harga_total,
             status: 'menunggu verifikasi',
-            sesisId: sesisId,
-            slot_dibeli: slot_dibeli,
             userId: userId
         });
+        if (transaction) {
+            // const OAuth2 = google.auth.OAuth2;
+            const user = await Users.findByPk(userId)
+
+            let transporter = nodemailer.createTransport({
+                service: "gmail",
+                    host: "smtp.gmail.com",
+                    port: 587,
+                    secure: false,
+                    auth: {
+                        user: process.env.MAIL_USERNAME,
+                        pass: process.env.MAIL_PASSWORD,
+                    },
+                });
+                let mailOptions = {
+                    from: 'Melocal <melocal@gmail.com>',
+                    to: 'ferzanoveri@gmail.com',
+                    subject: 'Nodemailer Project',
+                    text: 'Hi from your nodemailer project'
+                  };
+
+                  transporter.sendMail(mailOptions, function(err, data) {
+                    if (err) {
+                      console.log("Error " + err);
+                    } else {
+                      console.log("Email sent successfully");
+                    }
+                  });
+                  
+        //     const message = { 
+        //         messaging_product: "whatsapp", 
+        //         to: "6281314262109", 
+        //         type: "template", 
+        //         template: { 
+        //             name: "hello_world", 
+        //             language: { 
+        //                 code: "en_US" 
+        //             } 
+        //         } }
+        //     fetch('https://graph.facebook.com/v17.0/112473161958400/messages', {
+        //         method: 'POST',
+        //         body: JSON.stringify(message),
+        //         headers: { 
+        //             'Content-Type': 'application/json',
+        //             Authorization: 'Bearer EAAIZBFmaltikBO8nj8UoWAve21DBWzahUcKfSPk7MYprU1PjNZAZC3EzSw9PFy0Nt0hWCrcI3T9nStv43WYgIKqXgU6KpxambIK6L3elxeSmSl687I6Fe7hJCN0sDx1zRNvgQ01xmvHz4Nbvqluoa2vqMj586VA1KxUhbOZBSKgXGhta5ymBOFI9RZCUPTZAtuLCknBO54DhoRGAF7' 
+        //         }
+        //     })
+        //     .then(res => res.json())
+        //     .then(json => console.log(json));
+        }
         res.status(201).json({msg: "Transaction Created Successfully"})
     } catch (error) {
+        console.log(error);
         res.status(500).json({msg: error.message});
     }
 }
