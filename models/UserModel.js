@@ -4,6 +4,12 @@ import db from "../config/Database.js";
 const {DataTypes} = Sequelize;
 
 const Users = db.define('users', {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      primaryKey: true,
+      allowNull: false
+      },
     nama:{
         type: DataTypes.STRING,
         allowNull: false,

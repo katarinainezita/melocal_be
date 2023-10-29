@@ -7,6 +7,12 @@ import Activities from "./ActivityModel.js";
 const {DataTypes} = Sequelize;
 
 const Reviews = db.define('reviews', {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      primaryKey: true,
+      allowNull: false
+      },
     bintang: DataTypes.INTEGER,
     pesan: DataTypes.TEXT
 }, {
