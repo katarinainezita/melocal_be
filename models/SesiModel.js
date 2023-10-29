@@ -21,6 +21,6 @@ const Sesis = db.define('sesis', {
 });
 
 Activities.hasMany(Sesis);
-Sesis.belongsTo(Activities)
+Sesis.belongsTo(Activities);
 
 export default Sesis;

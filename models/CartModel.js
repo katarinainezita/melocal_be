@@ -16,4 +16,4 @@ Carts.belongsTo(Users);
 Sesis.hasMany(Carts);
 Carts.belongsTo(Sesis);
 
-export default Carts;
+// export default Carts;

@@ -71,6 +71,27 @@ export const createUser = async(req, res) => {
     }
 }
 
+export const createUserMitra = async(req, res) => {
+    const {nama, email, no_telp, password, confPassword} = req.body;
+    if(password !== confPassword) return res.status(400).json({msg: "Password dan Confirm Password tidak cocok"})
+    const hashPassword = await argon2.hash(password);
+    try {
+        await Users.create({
+            nama: nama,
+            email: email,
+            no_telp: no_telp,
+            password: hashPassword,
+            melocal_points: 0,
+            role: 'mitra'
+        });
+        res.status(201).json({msg: "Register Berhasil"});
+    } catch (error) {
+        res.status(400).json({
+            msg: error.message
+        });
+    }
+}
+
 export const updateUser = async(req, res) => {
     const user = await Users.findOne({
             where: {
@@ -85,7 +106,7 @@ export const updateUser = async(req, res) => {
     }else{
         hashPassword = await argon2.hash(password);
     }
-    if(password !== confPassword) return res.status(400).json({msg: "Password dan Confirm Password tidak cocok"})
+    // if(password !== confPassword) return res.status(400).json({msg: "Password dan Confirm Password tidak cocok"})
     try {
         await Users.update({
             nama: nama,
@@ -99,13 +120,18 @@ export const updateUser = async(req, res) => {
                 id: user.id
             }
         });
-        res.status(201).json({msg: "User Berhasil di Update"});
+        const response = await Users.findOne({
+            attributes:['id', 'nama', 'email', 'no_telp', 'melocal_points','role'],            
+            where: {
+                id : user.id
+            }
+        });
+        res.status(201).json(response);
     } catch (error) {
         res.status(400).json({
             msg: error.message
         });
     }
-    
 }
 
 export const deleteUser = async(req, res) => {

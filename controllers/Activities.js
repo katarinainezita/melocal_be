@@ -5,26 +5,26 @@ import { Op } from "sequelize";
 export const getActivities = async(req, res) => {
     try {
         let response;
-        if(req.role === "admin"){
+        // if(req.role === "admin"){
+        //     response = await Activities.findAll({
+        //         attributes:['id', 'nama', 'deskripsi', 'harga', 'fitur', 'bintang', 'lokasi', 'nama_tourguide', 'kontak_tourguide'],
+        //         include:[{
+        //             model: Users, 
+        //             attributes:['nama','email']
+        //         }]
+        //     });
+        // } else {
             response = await Activities.findAll({
                 attributes:['id', 'nama', 'deskripsi', 'harga', 'fitur', 'bintang', 'lokasi', 'nama_tourguide', 'kontak_tourguide'],
-                include:[{
-                    model: Users, 
-                    attributes:['nama','email']
-                }]
+                // where:{
+                //     userId: req.userId
+                // },
+                // include:[{
+                //     model: Users,
+                //     attributes:['nama','email']
+                // }]
             });
-        } else {
-            response = await Activities.findAll({
-                attributes:['id', 'nama', 'deskripsi', 'harga', 'fitur', 'bintang', 'lokasi', 'nama_tourguide', 'kontak_tourguide'],
-                where:{
-                    userId: req.userId
-                },
-                include:[{
-                    model: Users,
-                    attributes:['nama','email']
-                }]
-            });
-        }
+        // }
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({msg: error.message});
@@ -35,11 +35,11 @@ export const getActivityById = async(req, res) => {
     try {
         const activity = await Activities.findOne({
             where: {
-                id: req.params.id
+                id: req.params.userId
             }
             
         })
-        if(!activity) return res.status(404).json({msg: "Data tidak ditemukan"});
+        // if(!activity) return res.status(404).json({msg: "Data tidak ditemukan"});
         let response;
         if(req.role === "admin"){
             response = await Activities.findOne({
@@ -53,10 +53,10 @@ export const getActivityById = async(req, res) => {
                 }]
             });
         } else {
-            response = await Activities.findOne({
+            response = await Activities.findAll({
                 attributes:['id', 'nama', 'deskripsi', 'harga', 'fitur', 'bintang', 'lokasi', 'nama_tourguide', 'kontak_tourguide'],
                 where:{
-                    [Op.and]:[{id: activity.id}, {userId: req.userId}]   
+                    userId: req.params.userId
                 },
                 include:[{
                     model: Users,
@@ -78,11 +78,11 @@ export const createActivity = async(req, res) => {
             deskripsi: deskripsi,
             harga: harga,
             fitur: fitur,
-            bintang: bintang,
+            bintang: 0,
             lokasi: lokasi,
             nama_tourguide: nama_tourguide,
             kontak_tourguide: kontak_tourguide,
-            userId: req.userId
+            userId: req.params.userId
         });
         res.status(201).json({msg: "Activity Created Successfully"})
     } catch (error) {
@@ -109,12 +109,12 @@ export const updateActivity = async(req, res) => {
                 }
             });
         } else {
-            if(req.userId !== activity.userId) return res.status(403).json({msg: "Akses terlarang"});
+            // if(req.userId !== activity.userId) return res.status(403).json({msg: "Akses terlarang"});
             await Activities.update({
                 nama, deskripsi, harga, fitur, bintang, lokasi, nama_tourguide, kontak_tourguide
             },{
                 where:{
-                    [Op.and]:[{id: activity.id}, {userId: req.userId}]   
+                    id: activity.id   
                 }
             });
         }
