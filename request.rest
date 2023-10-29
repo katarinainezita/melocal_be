@@ -125,7 +125,7 @@ Content-Type: application/json
 
 // Tampilin siapa yg lagi login
 ###
-GET http://localhost:5000/me
+GET http://localhost:3000/users/me
 
 // Logout Users
 ###
