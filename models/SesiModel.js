@@ -4,6 +4,12 @@ import Activities from "./ActivityModel.js";
 const {DataTypes} = Sequelize;
 
 const Sesis = db.define('sesis', {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      primaryKey: true,
+      allowNull: false
+      },
     nama: {
         type: DataTypes.STRING,
         allowNull: false,

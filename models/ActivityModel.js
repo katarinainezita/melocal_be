@@ -5,6 +5,12 @@ import Users from "./UserModel.js";
 const {DataTypes} = Sequelize;
 
 const Activities = db.define('activities', {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      primaryKey: true,
+      allowNull: false
+      },
     nama:{
         type: DataTypes.STRING,
         allowNull: false,
