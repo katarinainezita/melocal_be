@@ -10,9 +10,7 @@ import {
 } from "../controllers/Users.js";
 import { verifyUser, adminOnly } from "../middleware/AuthUser.js";
 
-
 const router = express.Router();
-
 
 router.get('/users',  getUsers);
 router.get('/users/:id', getUserById);

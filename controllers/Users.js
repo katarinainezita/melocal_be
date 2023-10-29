@@ -51,8 +51,8 @@ export const getUserByEmail = async(req, res) => {
 }
 
 export const createUser = async(req, res) => {
-    const {nama, email, no_telp, password, confPassword, role} = req.body;
-    if(password !== confPassword) return res.status(400).json({msg: "Password dan Confirm Password tidak cocok"})
+    const {nama, email, no_telp, password, confirm_password, role} = req.body;
+    if(password !== confirm_password) return res.status(400).json({msg: "Password dan Confirm Password tidak cocok"})
     const hashPassword = await argon2.hash(password);
     try {
         await Users.create({

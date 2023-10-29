@@ -27,6 +27,8 @@ export const Me = async (req, res) => {
     if (!req.session.userId ) {
       return res.status(401).json({ msg: "Mohon login ke akun Anda!" });
     }
+
+  console.log(req.session.userId)
     const user = await Users.findOne({
         attributes: ['id', 'nama', 'email', 'no_telp', 'melocal_points', 'role'],
         where: {

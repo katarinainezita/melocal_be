@@ -51,7 +51,7 @@ Content-Type: application/json
     "email": "inezitakatarina16@gmail.com",
     "no_telp": "085156961625",
 	"password": "Aai94i",
-    "confPassword": "Aai94i"
+    "confirm_password": "Aai94i"
 }
 
 ###
