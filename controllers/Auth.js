@@ -1,8 +1,8 @@
 import Users from "../models/UserModel.js";
 import argon2 from "argon2";
+import { generateToken } from "../middleware/AuthUser.js";
 
-
-export const Login = async(req, res) => {
+export const login = async(req, res) => {
     const user = await Users.findOne({
         where: {
             email: req.body.email
@@ -20,31 +20,39 @@ export const Login = async(req, res) => {
     const no_telp = user.no_telp;
     const melocal_points = user.melocal_points;
     const role = user.role;
-    res.status(200).json({id, nama, email, no_telp, melocal_points, role});
+    const token = await generateToken(req, res);
+  
+    res.status(200).json({id, nama, email, no_telp, melocal_points, role, token});
 }
 
-export const Me = async (req, res) => {
-    if (!req.session.userId ) {
-      return res.status(401).json({ msg: "Mohon login ke akun Anda!" });
-    }
-
-  console.log(req.session.userId)
-    const user = await Users.findOne({
-        attributes: ['id', 'nama', 'email', 'no_telp', 'melocal_points', 'role'],
-        where: {
-          id: req.session.userId
-        }
-      });
-      if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
-      res.status(200).json(user);
-    
-  };
-
-
-
-export const logOut = async(req, res) => {
+export const logout = async(req, res) => {
     req.session.destroy((err) => {
         if(err) return res.status(400).json({msg: "Tidak dapat logout"});
         res.status(200).json({msg: "Anda telah logout"})
     });
+}
+
+export const me = async (req, res) => {
+  try {
+    const user = await Users.findOne({
+      where: {
+        id: req.userId,
+      },
+    });
+
+    if (!user) return res.status(404).json({ msg: "User tidak ditemukan" });
+
+    const data = {
+      id: user.id,
+      nama: user.nama,
+      email: user.email,
+      no_telp: user.no_telp,
+      melocal_points: user.melocal_points,
+      role: user.role,
+    };
+
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(404).json({ msg: error.message });
+  }
 }
