@@ -57,7 +57,7 @@ export const getTransactions = async (req, res) => {
     }
     res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -69,7 +69,7 @@ export const getTransactionById = async (req, res) => {
       },
     });
     if (!transaction)
-      return res.status(404).json({ msg: "Data tidak ditemukan" });
+      return res.status(404).json({ message: "Data tidak ditemukan" });
     let response;
     if (req.role === "admin") {
       response = await Transactions.findOne({
@@ -112,7 +112,7 @@ export const getTransactionById = async (req, res) => {
     }
     res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -139,7 +139,7 @@ export const getPendingTransactions = async (req, res) => {
 
     res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -182,10 +182,10 @@ export const createTransaction = async (req, res) => {
         }
       });
     }
-    res.status(201).json({ msg: "Transaction Created Successfully" });
+    res.status(201).json({ message: "Transaction Created Successfully" });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -202,9 +202,9 @@ export const updateVerifyTransaction = async (req, res) => {
         },
       }
     );
-    res.status(200).json({ msg: "Transaction Updated Successfully" });
+    res.status(200).json({ message: "Transaction Updated Successfully" });
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -216,7 +216,7 @@ export const updateTransaction = async (req, res) => {
       },
     });
     if (!transaction)
-      return res.status(404).json({ msg: "Data tidak ditemukan" });
+      return res.status(404).json({ message: "Data tidak ditemukan" });
     const { metode_pembayaran, harga_total, status } = req.body;
     if (req.role === "admin") {
       await Activities.update(
@@ -233,7 +233,7 @@ export const updateTransaction = async (req, res) => {
       );
     } else {
       if (req.userId !== transaction.userId)
-        return res.status(403).json({ msg: "Akses terlarang" });
+        return res.status(403).json({ message: "Akses terlarang" });
       await Transactions.update(
         {
           metode_pembayaran,
@@ -247,9 +247,9 @@ export const updateTransaction = async (req, res) => {
         }
       );
     }
-    res.status(200).json({ msg: "Product Updated Successfully" });
+    res.status(200).json({ message: "Product Updated Successfully" });
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -266,9 +266,9 @@ export const updateDenyTransaction = async (req, res) => {
         },
       }
     );
-    res.status(200).json({ msg: "Transaction Updated Successfully" });
+    res.status(200).json({ message: "Transaction Updated Successfully" });
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -280,7 +280,7 @@ export const deleteTransaction = async (req, res) => {
       },
     });
     if (!transaction)
-      return res.status(404).json({ msg: "Data tidak ditemukan" });
+      return res.status(404).json({ message: "Data tidak ditemukan" });
     if (req.role === "admin") {
       await transaction.destroy({
         where: {
@@ -289,15 +289,15 @@ export const deleteTransaction = async (req, res) => {
       });
     } else {
       if (req.userId !== transaction.userId)
-        return res.status(403).json({ msg: "Akses terlarang" });
+        return res.status(403).json({ message: "Akses terlarang" });
       await Transactions.destroy({
         where: {
           [Op.and]: [{ id: transaction.id }, { userId: req.userId }],
         },
       });
     }
-    res.status(200).json({ msg: "Product Deleted Successfully" });
+    res.status(200).json({ message: "Product Deleted Successfully" });
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };

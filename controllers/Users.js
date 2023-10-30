@@ -10,7 +10,7 @@ export const getUsers = async(req, res) => {
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({
-            msg: error.message
+            message: error.message
         });
         
     }
@@ -27,7 +27,7 @@ export const getUserById = async(req, res) => {
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({
-            msg: error.message
+            message: error.message
         });
         
     }
@@ -44,7 +44,7 @@ export const getUserByEmail = async(req, res) => {
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json({
-            msg: error.message
+            message: error.message
         });
         
     }
@@ -52,7 +52,7 @@ export const getUserByEmail = async(req, res) => {
 
 export const createUser = async(req, res) => {
     const {nama, email, no_telp, password, confirm_password, role} = req.body;
-    if(password !== confirm_password) return res.status(400).json({msg: "Password dan Confirm Password tidak cocok"})
+    if(password !== confirm_password) return res.status(400).json({message: "Password dan Confirm Password tidak cocok"})
     const hashPassword = await argon2.hash(password);
     try {
         await Users.create({
@@ -63,17 +63,17 @@ export const createUser = async(req, res) => {
             melocal_points: 0,
             role: role
         });
-        res.status(201).json({msg: "Register Berhasil"});
+        res.status(201).json({message: "Register Berhasil"});
     } catch (error) {
         res.status(400).json({
-            msg: error.message
+            message: error.message
         });
     }
 }
 
 export const createUserMitra = async(req, res) => {
     const {nama, email, no_telp, password, confPassword} = req.body;
-    if(password !== confPassword) return res.status(400).json({msg: "Password dan Confirm Password tidak cocok"})
+    if(password !== confPassword) return res.status(400).json({message: "Password dan Confirm Password tidak cocok"})
     const hashPassword = await argon2.hash(password);
     try {
         await Users.create({
@@ -84,10 +84,10 @@ export const createUserMitra = async(req, res) => {
             melocal_points: 0,
             role: 'mitra'
         });
-        res.status(201).json({msg: "Register Berhasil"});
+        res.status(201).json({message: "Register Berhasil"});
     } catch (error) {
         res.status(400).json({
-            msg: error.message
+            message: error.message
         });
     }
 }
@@ -98,7 +98,7 @@ export const updateUser = async(req, res) => {
                 id : req.params.id
             }
     });
-    if(!user) return res.status(404).json({msg: "User tidak ditemukan"});
+    if(!user) return res.status(404).json({message: "User tidak ditemukan"});
     const {nama, email, no_telp, password, confPassword, melocal_points, role} = req.body;
     let hashPassword;
     if(password === "" || password === null){
@@ -106,7 +106,7 @@ export const updateUser = async(req, res) => {
     }else{
         hashPassword = await argon2.hash(password);
     }
-    // if(password !== confPassword) return res.status(400).json({msg: "Password dan Confirm Password tidak cocok"})
+    // if(password !== confPassword) return res.status(400).json({message: "Password dan Confirm Password tidak cocok"})
     try {
         await Users.update({
             nama: nama,
@@ -129,7 +129,7 @@ export const updateUser = async(req, res) => {
         res.status(201).json(response);
     } catch (error) {
         res.status(400).json({
-            msg: error.message
+            message: error.message
         });
     }
 }
@@ -140,17 +140,17 @@ export const deleteUser = async(req, res) => {
                 id : req.params.id
             }
     });
-    if(!user) return res.status(404).json({msg: "User tidak ditemukan"});
+    if(!user) return res.status(404).json({message: "User tidak ditemukan"});
     try {
         await Users.destroy({
             where:{
                 id: user.id
             }
         });
-        res.status(200).json({msg: "User Berhasil di Delete"});
+        res.status(200).json({message: "User Berhasil di Delete"});
     } catch (error) {
         res.status(400).json({
-            msg: error.message
+            message: error.message
         });
     }
 }

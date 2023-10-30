@@ -27,7 +27,7 @@ export const getActivities = async(req, res) => {
         // }
         res.status(200).json(response);
     } catch (error) {
-        res.status(500).json({msg: error.message});
+        res.status(500).json({message: error.message});
     }
 }
 
@@ -39,7 +39,7 @@ export const getActivityById = async(req, res) => {
             }
             
         })
-        // if(!activity) return res.status(404).json({msg: "Data tidak ditemukan"});
+        // if(!activity) return res.status(404).json({message: "Data tidak ditemukan"});
         let response;
         if(req.role === "admin"){
             response = await Activities.findOne({
@@ -66,7 +66,7 @@ export const getActivityById = async(req, res) => {
         }
         res.status(200).json(response);
     } catch (error) {
-        res.status(500).json({msg: error.message});
+        res.status(500).json({message: error.message});
     }
 }
 
@@ -84,9 +84,9 @@ export const createActivity = async(req, res) => {
             kontak_tourguide: kontak_tourguide,
             userId: req.params.userId
         });
-        res.status(201).json({msg: "Activity Created Successfully"})
+        res.status(201).json({message: "Activity Created Successfully"})
     } catch (error) {
-        res.status(500).json({msg: error.message});
+        res.status(500).json({message: error.message});
     }
 }
 
@@ -98,7 +98,7 @@ export const updateActivity = async(req, res) => {
             }
             
         })
-        if(!activity) return res.status(404).json({msg: "Data tidak ditemukan"});
+        if(!activity) return res.status(404).json({message: "Data tidak ditemukan"});
         const { nama, deskripsi, harga, fitur, bintang, lokasi, nama_tourguide, kontak_tourguide} = req.body;
         if(req.role === "admin"){
             await Activities.update({
@@ -109,7 +109,7 @@ export const updateActivity = async(req, res) => {
                 }
             });
         } else {
-            // if(req.userId !== activity.userId) return res.status(403).json({msg: "Akses terlarang"});
+            // if(req.userId !== activity.userId) return res.status(403).json({message: "Akses terlarang"});
             await Activities.update({
                 nama, deskripsi, harga, fitur, bintang, lokasi, nama_tourguide, kontak_tourguide
             },{
@@ -118,9 +118,9 @@ export const updateActivity = async(req, res) => {
                 }
             });
         }
-        res.status(200).json({msg: "Product Updated Successfully"});
+        res.status(200).json({message: "Product Updated Successfully"});
     } catch (error) {
-        res.status(500).json({msg: error.message});
+        res.status(500).json({message: error.message});
     }
 }
 
@@ -132,7 +132,7 @@ export const deleteActivity = async(req, res) => {
             }
             
         })
-        if(!activity) return res.status(404).json({msg: "Data tidak ditemukan"});
+        if(!activity) return res.status(404).json({message: "Data tidak ditemukan"});
         if(req.role === "admin"){
             await Activities.destroy({
                 where:{
@@ -140,16 +140,16 @@ export const deleteActivity = async(req, res) => {
                 }
             });
         } else {
-            if(req.userId !== activity.userId) return res.status(403).json({msg: "Akses terlarang"});
+            if(req.userId !== activity.userId) return res.status(403).json({message: "Akses terlarang"});
             await Activities.destroy({
                 where:{
                     [Op.and]:[{id: activity.id}, {userId: req.userId}]   
                 }
             });
         }
-        res.status(200).json({msg: "Product Deleted Successfully"});
+        res.status(200).json({message: "Product Deleted Successfully"});
     } catch (error) {
-        res.status(500).json({msg: error.message});
+        res.status(500).json({message: error.message});
     }
 }
 
@@ -163,7 +163,7 @@ export const deleteActivity = async(req, res) => {
 //             offset: (page-1) * size,
             
 //         })
-//         if(!activity) return res.status(404).json({msg: "Data tidak ditemukan"});
+//         if(!activity) return res.status(404).json({message: "Data tidak ditemukan"});
 //         const { nama, deskripsi, harga, fitur, bintang, lokasi, kontak_pengelola} = req.body;
 //         if(req.role === "admin"){
 //             await Activities.destroy({
@@ -172,15 +172,15 @@ export const deleteActivity = async(req, res) => {
 //                 }
 //             });
 //         } else {
-//             if(req.userId !== activity.userId) return res.status(403).json({msg: "Akses terlarang"});
+//             if(req.userId !== activity.userId) return res.status(403).json({message: "Akses terlarang"});
 //             await Activities.destroy({
 //                 where:{
 //                     [Op.and]:[{id: activity.id}, {userId: req.userId}]   
 //                 }
 //             });
 //         }
-//         res.status(200).json({msg: "Product Deleted Successfully"});
+//         res.status(200).json({message: "Product Deleted Successfully"});
 //     } catch (error) {
-//         res.status(500).json({msg: error.message});
+//         res.status(500).json({message: error.message});
 //     }
 // }

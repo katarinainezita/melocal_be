@@ -13,7 +13,7 @@
 //             }
             
 //         })
-//         if(!detail) return res.status(404).json({msg: "Data tidak ditemukan"});
+//         if(!detail) return res.status(404).json({message: "Data tidak ditemukan"});
 //         let response = await Detail_transactions.findAll({
 //                 attributes:['jumlah'],
 //                 where:{
@@ -29,7 +29,7 @@
 //             });
 //         res.status(200).json(response);
 //     } catch (error) {
-//         res.status(500).json({msg: error.message});
+//         res.status(500).json({message: error.message});
 //     }
 // }
 
@@ -44,9 +44,9 @@
 //             transactionId: null,
 //             sesisId:sesisId
 //         });
-//         res.status(201).json({msg: "Detail Created Successfully"})
+//         res.status(201).json({message: "Detail Created Successfully"})
 //     } catch (error) {
-//         res.status(500).json({msg: error.message});
+//         res.status(500).json({message: error.message});
 //     }
 // }
 
@@ -58,7 +58,7 @@
 //             }
             
 //         })
-//         if(!detail) return res.status(404).json({msg: "Data tidak ditemukan"});
+//         if(!detail) return res.status(404).json({message: "Data tidak ditemukan"});
 //         const {jumlah} = req.body;
 //         await Detail_transactions.update({
 //             jumlah
@@ -67,9 +67,9 @@
 //                     id: detail.id  
 //                 }
 //             });
-//         res.status(200).json({msg: "Detail Transaction Updated Successfully"});
+//         res.status(200).json({message: "Detail Transaction Updated Successfully"});
 //     } catch (error) {
-//         res.status(500).json({msg: error.message});
+//         res.status(500).json({message: error.message});
 //     }
 // }
 
@@ -81,15 +81,15 @@
 //             }
             
 //         })
-//         if(!detail) return res.status(404).json({msg: "Data tidak ditemukan"});
+//         if(!detail) return res.status(404).json({message: "Data tidak ditemukan"});
 //         await Detail_transactions.destroy({
 //                 where:{
 //                     id: detail.id  
 //                 }
 //         });
-//         res.status(200).json({msg: "Detail Transaction Deleted Successfully"});
+//         res.status(200).json({message: "Detail Transaction Deleted Successfully"});
 //     } catch (error) {
-//         res.status(500).json({msg: error.message});
+//         res.status(500).json({message: error.message});
 //     }
 // }
 

@@ -18,7 +18,7 @@ export const getImage = async (req, res) => {
     });
     res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -31,7 +31,7 @@ export const getImageById = async (req, res) => {
         activityId: activityId,
       },
     });
-    if (!image) return res.status(404).json({ msg: "Data tidak ditemukan" });
+    if (!image) return res.status(404).json({ message: "Data tidak ditemukan" });
     let response = await Images.findAll({
       attributes: ["nama", "url"],
       where: {
@@ -46,7 +46,7 @@ export const getImageById = async (req, res) => {
     });
     res.status(200).json(response);
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -69,9 +69,9 @@ export const createImage = async (req, res) => {
       url: `${process.env.BASE_URL}/${file}`,
       activityId: activityId,
     });
-    res.status(201).json({ msg: "Image Created Successfully", file: file });
+    res.status(201).json({ message: "Image Created Successfully", file: file });
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -82,7 +82,7 @@ export const updateImage = async (req, res) => {
         id: req.params.id,
       },
     });
-    if (!image) return res.status(404).json({ msg: "Data tidak ditemukan" });
+    if (!image) return res.status(404).json({ message: "Data tidak ditemukan" });
     const { nama, url } = req.body;
     await Images.update(
       {
@@ -95,9 +95,9 @@ export const updateImage = async (req, res) => {
         },
       }
     );
-    res.status(200).json({ msg: "Image Updated Successfully" });
+    res.status(200).json({ message: "Image Updated Successfully" });
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -108,14 +108,14 @@ export const deleteImage = async (req, res) => {
         id: req.params.id,
       },
     });
-    if (!image) return res.status(404).json({ msg: "Data tidak ditemukan" });
+    if (!image) return res.status(404).json({ message: "Data tidak ditemukan" });
     await Images.destroy({
       where: {
         id: image.id,
       },
     });
-    res.status(200).json({ msg: "Image Deleted Successfully" });
+    res.status(200).json({ message: "Image Deleted Successfully" });
   } catch (error) {
-    res.status(500).json({ msg: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
