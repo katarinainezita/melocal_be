@@ -22,19 +22,19 @@ import {
   deleteImage,
 } from "../controllers/Image.js";
 
-import { verifyUser } from "../middleware/AuthUser.js";
+import { verifyUser, verifyToken } from "../middleware/AuthUser.js";
 
 const router = express.Router();
 // verifyUser
 
-router.get("/images", getImage);
-router.get("/images/:activityId", getImageById);
+router.get("/images", verifyToken, getImage);
+router.get("/images/:activityId", verifyToken, getImageById);
 router.post(
   "/images/:activityId",
-  multer({ storage: diskStorage }).single("photo"),
+  multer({ storage: diskStorage }).single("photo"), verifyToken,
   createImage
 );
-router.put("/images/:id", updateImage);
-router.delete("/images/:id", deleteImage);
+router.put("/images/:id", verifyToken, updateImage);
+router.delete("/images/:id", verifyToken, deleteImage);
 
 export default router;
