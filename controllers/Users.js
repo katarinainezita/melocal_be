@@ -52,7 +52,15 @@ export const getUserByEmail = async(req, res) => {
 
 export const createUser = async(req, res) => {
     const {nama, email, no_telp, password, confirm_password, role} = req.body;
-    if(password !== confirm_password) return res.status(400).json({message: "Password dan Confirm Password tidak cocok"})
+    if (password !== confirm_password) return res.status(400).json({ message: "Password dan Confirm Password tidak cocok" })
+    
+    const checkEmail = await Users.findOne({
+      where: {
+        email: email
+      }
+    });
+
+    if (checkEmail) return res.status(400).json({ message: "Email sudah terdaftar" })
     const hashPassword = await argon2.hash(password);
     try {
         await Users.create({
@@ -72,8 +80,8 @@ export const createUser = async(req, res) => {
 }
 
 export const createUserMitra = async(req, res) => {
-    const {nama, email, no_telp, password, confPassword} = req.body;
-    if(password !== confPassword) return res.status(400).json({message: "Password dan Confirm Password tidak cocok"})
+    const {nama, email, no_telp, password, confirm_password} = req.body;
+    if(password !== confirm_password) return res.status(400).json({message: "Password dan Confirm Password tidak cocok"})
     const hashPassword = await argon2.hash(password);
     try {
         await Users.create({
@@ -95,11 +103,11 @@ export const createUserMitra = async(req, res) => {
 export const updateUser = async(req, res) => {
     const user = await Users.findOne({
             where: {
-                id : req.params.id
+                id : req.userId
             }
     });
     if(!user) return res.status(404).json({message: "User tidak ditemukan"});
-    const {nama, email, no_telp, password, confPassword, melocal_points, role} = req.body;
+    const {nama, email, no_telp, password, melocal_points} = req.body;
     let hashPassword;
     if(password === "" || password === null){
         hashPassword = user.password
@@ -114,18 +122,13 @@ export const updateUser = async(req, res) => {
             no_telp: no_telp,
             password: hashPassword,
             melocal_points: melocal_points, 
-            role: role
         }, {
             where:{
                 id: user.id
             }
         });
-        const response = await Users.findOne({
-            attributes:['id', 'nama', 'email', 'no_telp', 'melocal_points','role'],            
-            where: {
-                id : user.id
-            }
-        });
+      
+        const response = {nama, email, no_telp, melocal_points, role: user.role}
         res.status(201).json(response);
     } catch (error) {
         res.status(400).json({
@@ -137,7 +140,7 @@ export const updateUser = async(req, res) => {
 export const deleteUser = async(req, res) => {
     const user = await Users.findOne({
             where: {
-                id : req.params.id
+                id : req.params.userId
             }
     });
     if(!user) return res.status(404).json({message: "User tidak ditemukan"});

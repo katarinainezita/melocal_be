@@ -8,16 +8,16 @@ import {
     updateUser,
     deleteUser
 } from "../controllers/Users.js";
-import { verifyUser, adminOnly, verifyToken } from "../middleware/AuthUser.js";
+import { verifyToken, verifyTokenForAdmin } from "../middleware/AuthUser.js";
 
 const router = express.Router();
 
-router.get('/users',verifyToken, getUsers);
-router.get('/users/:id',verifyToken, getUserById);
-router.get('/users/:email', verifyUser, verifyToken, adminOnly, getUserByEmail);
-router.post('/users', verifyToken, createUser);
-router.post('/usermitra', verifyToken, createUserMitra);
-router.patch('/users/:id', verifyToken, updateUser);
-router.delete('/users/:id', verifyUser, verifyToken, adminOnly, deleteUser);
+router.get('/users', verifyToken, getUsers); // Harusnya buat admin dan mitra
+router.get('/users/:id', verifyToken, getUserById); // Harusnya buat admin dan mitra
+// router.get('/users/:email', verifyUser, verifyToken, adminOnly, getUserByEmail); // role admin
+router.post('/users', createUser);
+router.post('/mitra', createUserMitra);
+router.patch('/users', verifyToken, updateUser);
+router.delete('/users/:userId', verifyTokenForAdmin, deleteUser); //role admin
 
 export default router;

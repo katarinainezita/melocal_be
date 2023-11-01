@@ -35,13 +35,21 @@ export const getActivityById = async(req, res) => {
     try {
         const activity = await Activities.findOne({
             where: {
-                id: req.params.userId
+                id: req.params.id
             }
             
         })
+      
+        const user = await Users.findOne({
+          where: {
+            id: req.userId,
+          },
+        });
+
+        if(!user) return res.status(404).json({message: "User tidak ditemukan"});
         // if(!activity) return res.status(404).json({message: "Data tidak ditemukan"});
         let response;
-        if(req.role === "admin"){
+        if(user.role === "admin"){
             response = await Activities.findOne({
                 attributes:['id', 'nama', 'deskripsi', 'harga', 'fitur', 'bintang', 'lokasi', 'nama_tourguide', 'kontak_tourguide'],
                 where: {
@@ -71,7 +79,7 @@ export const getActivityById = async(req, res) => {
 }
 
 export const createActivity = async(req, res) => {
-    const { nama, deskripsi, harga, fitur, bintang, lokasi, nama_tourguide, kontak_tourguide} = req.body;
+    const { nama, deskripsi, harga, fitur, lokasi, nama_tourguide, kontak_tourguide} = req.body;
     try {
         await Activities.create({
             nama: nama,
@@ -82,7 +90,6 @@ export const createActivity = async(req, res) => {
             lokasi: lokasi,
             nama_tourguide: nama_tourguide,
             kontak_tourguide: kontak_tourguide,
-            userId: req.params.userId
         });
         res.status(201).json({message: "Activity Created Successfully"})
     } catch (error) {
@@ -98,7 +105,7 @@ export const updateActivity = async(req, res) => {
             }
             
         })
-        if(!activity) return res.status(404).json({message: "Data tidak ditemukan"});
+        if(!activity) return res.status(404).json({message: "Activity tidak ditemukan"});
         const { nama, deskripsi, harga, fitur, bintang, lokasi, nama_tourguide, kontak_tourguide} = req.body;
         if(req.role === "admin"){
             await Activities.update({
