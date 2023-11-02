@@ -37,10 +37,6 @@
 # // Delete Partner
 # DELETE  http://localhost:5000/partners/1
 
-
-
-
-
 ###
 // Create Users
 POST http://localhost:3000/users

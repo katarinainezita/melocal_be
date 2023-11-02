@@ -1,6 +1,7 @@
 import Users from "../models/UserModel.js";
 import argon2 from "argon2";
 import { generateToken } from "../middleware/AuthUser.js";
+import { MelocalException } from "../utils/Response.js";
 
 export const login = async (req, res) => {
   const user = await Users.findOne({
@@ -9,24 +10,26 @@ export const login = async (req, res) => {
     },
   });
 
-  if (!user) return res.status(404).json({ message: "User tidak ditemukan" });
+  if (!user) return MelocalException(res, 404, "user tidak ditemukan", "error", null, null);
 
   const matchUser = await argon2.verify(user.password, req.body.password);
 
   if (!matchUser) {
-    return res.status(400).json({ message: "Wrong password" });
+    return MelocalException(res, 400, "password salah", "error", null, null);
   }
 
-  const id = user.id;
-  const nama = user.nama;
-  const email = user.email;
-  const no_telp = user.no_telp;
-  const melocal_points = user.melocal_points;
-  const role = user.role;
-
   const token = await generateToken(user);
-
-  res.status(200).json({ id, nama, email, no_telp, melocal_points, role, token });
+  const data = {
+    id: user.id,
+    nama: user.nama,
+    email: user.email,
+    no_telp: user.no_telp,
+    melocal_points: user.melocal_points,
+    role: user.role,
+    token: token,
+  };
+  
+  return MelocalException(res, 200, "login berhasil", "success", null, data);
 };
 
 

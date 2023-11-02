@@ -49,7 +49,7 @@ export const getActivityById = async(req, res) => {
         if(!user) return res.status(404).json({message: "User tidak ditemukan"});
         // if(!activity) return res.status(404).json({message: "Data tidak ditemukan"});
         let response;
-        if(user.role === "admin"){
+        if(req.role === "admin"){
             response = await Activities.findOne({
                 attributes:['id', 'nama', 'deskripsi', 'harga', 'fitur', 'bintang', 'lokasi', 'nama_tourguide', 'kontak_tourguide'],
                 where: {
