@@ -2,6 +2,7 @@
 
 import Users from '../models/UserModel.js';
 import jwt from 'jsonwebtoken';
+import { MelocalException, StatusResponse } from '../utils/Response.js';
 
 export const verifyUser = async (req, res, next) => {
   if (!req.userId) {
@@ -44,41 +45,40 @@ export const generateToken = async (user) => {
 
     return token;
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
   }
 };
 
-
-export const verifyTokenForAdmin = async (req, res, next) => {
+export const verifyTokenForMitra = async (req, res, next) => {
     const { authorization } = req.headers;
     try {
         if (!authorization) {
-            return res.status(401).json({ message: 'Token not found!' });
+            return MelocalException(res, 401, 'Token not found', StatusResponse.ERROR, null)
         }
         
         const token = authorization.replace('Bearer ', '');
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         if (!decoded) {
-            return res.status(401).json({ message: 'Invalid token' });
+            return MelocalException(res, 401, 'invalid token', StatusResponse.ERROR, null)
         }
       
         const data = { ...decoded }
-        const admin = await Users.findOne({
+        const mitra = await Users.findOne({
           where: {
             id: data.id,
           },
         });
 
-        if (!admin) return res.status(404).json({ message: 'User tidak ditemukan' });
-        if (admin.role !== 'admin') return res.status(403).json({ message: 'Akses terlarang' });
+        if (!mitra) return MelocalException(res, 404, 'mitra tidak ditemukan', StatusResponse.ERROR, null)
+        if (mitra.role !== 'mitra') return MelocalException(res, 403, 'akses terlarang', StatusResponse.ERROR, null)
         
         req.userId = data.id;
         req.role = data.role;
       
         next();
     } catch (error) {
-        return res.status(500).json({ message: error.message});
+        return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
     }
 };
 
@@ -86,14 +86,14 @@ export const verifyToken = async (req, res, next) => {
     const { authorization } = req.headers;
     try {
         if (!authorization) {
-            return res.status(401).json({ message: 'Token not found!' });
+            return MelocalException(res, 401, 'Token not found!', StatusResponse.ERROR, null)
         }
         
         const token = authorization.replace('Bearer ', '');
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         if (!decoded) {
-            return res.status(401).json({ message: 'Invalid token' });
+            return MelocalException(res, 401, 'invalid token', StatusResponse.ERROR, null)
         }
       
         const user = { ...decoded }
@@ -101,6 +101,6 @@ export const verifyToken = async (req, res, next) => {
         req.role = user.role;
         next();
     } catch (error) {
-        return res.status(500).json({ message: error.message});
+        return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
     }
 }

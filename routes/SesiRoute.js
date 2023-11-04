@@ -1,23 +1,21 @@
 import express from "express";
 import {
-    // getSesi,
+    getSesiByActivitesId,
     getSesiById,
     createSesi,
     updateSesi,
-    updateSesiSlot,
     deleteSesi
 } from "../controllers/Sesi.js";
 
-import { verifyUser, verifyToken } from "../middleware/AuthUser.js";
+import { verifyToken, verifyTokenForMitra } from "../middleware/AuthUser.js";
 
 const router = express.Router();
 // verifyUser
 
-// router.get('/sesis', getSesi);
-router.get('/sesis/:activityId', verifyToken, getSesiById);
-router.post('/sesis/:activityId', verifyToken, createSesi);
-router.put('/sesis/:id',verifyToken, updateSesi);
-router.patch('/sesis/:id',verifyToken, updateSesiSlot);
-router.delete('/sesis/:id',verifyToken, deleteSesi);
+router.get('/sesis/activites/:id', getSesiByActivitesId);
+router.get('/sesis/:id', verifyToken, getSesiById);
+router.post('/sesis', verifyTokenForMitra, createSesi);
+router.patch('/sesis/:id', verifyTokenForMitra, updateSesi);
+router.delete('/sesis/:id', verifyTokenForMitra, deleteSesi);
 
 export default router;

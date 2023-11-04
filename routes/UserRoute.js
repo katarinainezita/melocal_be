@@ -8,7 +8,7 @@ import {
     updateUser,
     deleteUser
 } from "../controllers/Users.js";
-import { verifyToken, verifyTokenForAdmin } from "../middleware/AuthUser.js";
+import { verifyToken, verifyTokenForMitra } from "../middleware/AuthUser.js";
 
 const router = express.Router();
 
@@ -18,6 +18,6 @@ router.get('/users/:id', verifyToken, getUserById); // Harusnya buat admin dan m
 router.post('/users', createUser);
 router.post('/mitra', createUserMitra);
 router.patch('/users', verifyToken, updateUser);
-router.delete('/users/:userId', verifyTokenForAdmin, deleteUser); //role admin
+router.delete('/users/:userId', verifyTokenForMitra, deleteUser); //role admin
 
 export default router;
