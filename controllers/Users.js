@@ -1,5 +1,6 @@
 import Users from "../models/UserModel.js";
 import argon2 from "argon2";
+import { MelocalException, StatusResponse } from "../utils/Response.js";
 
 
 export const getUsers = async(req, res) => {
@@ -7,11 +8,9 @@ export const getUsers = async(req, res) => {
         const response = await Users.findAll({
             attributes:['id', 'nama', 'email', 'no_telp', 'melocal_points', 'role']
         });
-        res.status(200).json(response);
+        return MelocalException(res, 200, 'user berhasil ditemukan', StatusResponse.SUCCESS, response)
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
         
     }
 }
@@ -24,11 +23,9 @@ export const getUserById = async(req, res) => {
                 id : req.params.id
             }
         });
-        res.status(200).json(response);
+        return MelocalException(res, 200, 'user berhasil ditemukan', StatusResponse.SUCCESS, response)
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
+        return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
         
     }
 }
@@ -41,18 +38,50 @@ export const getUserByEmail = async(req, res) => {
                 email : req.params.email
             }
         });
-        res.status(200).json(response);
+        return MelocalException(res, 200, 'user berhasil ditemukan', StatusResponse.SUCCESS, response)
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        });
-        
+        return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
     }
 }
 
 export const createUser = async(req, res) => {
     const {nama, email, no_telp, password, confirm_password, role} = req.body;
-    if (password !== confirm_password) return res.status(400).json({ message: "Password dan Confirm Password tidak cocok" })
+    if (password !== confirm_password) return MelocalException(res, 400, 'password dan confirm password tidak cocok', StatusResponse.ERROR, null)
+    const checkEmail = await Users.findOne({
+      where: {
+        email: email
+      }
+    });
+
+    if (checkEmail && checkEmail.role == 'user') return MelocalException(res, 400, 'email sudah terdaftar', StatusResponse.ERROR, null)
+    
+    const hashPassword = await argon2.hash(password);
+    try {
+      await Users.create({
+          nama: nama,
+          email: email,
+          no_telp: no_telp,
+          password: hashPassword,
+          melocal_points: 0,
+          role: 'user'
+      });
+        
+      const data = {
+        nama: nama,
+        email: email,
+        no_telp: no_telp,
+        melocal_points: 0,
+        role: 'user'
+      }
+      
+      return MelocalException(res, 201, 'register berhasil', StatusResponse.SUCCESS, data)
+    } catch (error) {
+      return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
+    }
+}
+
+export const createUserMitra = async(req, res) => {
+    const {nama, email, no_telp, password, confirm_password} = req.body;
     
     const checkEmail = await Users.findOne({
       where: {
@@ -60,28 +89,10 @@ export const createUser = async(req, res) => {
       }
     });
 
-    if (checkEmail) return res.status(400).json({ message: "Email sudah terdaftar" })
-    const hashPassword = await argon2.hash(password);
-    try {
-        await Users.create({
-            nama: nama,
-            email: email,
-            no_telp: no_telp,
-            password: hashPassword,
-            melocal_points: 0,
-            role: role
-        });
-        res.status(201).json({message: "Register Berhasil"});
-    } catch (error) {
-        res.status(400).json({
-            message: error.message
-        });
-    }
-}
-
-export const createUserMitra = async(req, res) => {
-    const {nama, email, no_telp, password, confirm_password} = req.body;
-    if(password !== confirm_password) return res.status(400).json({message: "Password dan Confirm Password tidak cocok"})
+    if (checkEmail && checkEmail.role == "mitra") return MelocalException(res, 400, 'email sudah terdaftar', StatusResponse.ERROR, null)
+  
+    if(password !== confirm_password) return MelocalException(res, 400, 'password dan confirm password tidak cocok', StatusResponse.ERROR, null)
+    
     const hashPassword = await argon2.hash(password);
     try {
         await Users.create({
@@ -92,11 +103,17 @@ export const createUserMitra = async(req, res) => {
             melocal_points: 0,
             role: 'mitra'
         });
-        res.status(201).json({message: "Register Berhasil"});
+        
+        const data = {
+          nama: nama,
+          email: email,
+          no_telp: no_telp,
+          melocal_points: 0,
+          role: 'mitra'
+        }
+        return MelocalException(res, 201, 'register berhasil', StatusResponse.SUCCESS, data)
     } catch (error) {
-        res.status(400).json({
-            message: error.message
-        });
+        return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
     }
 }
 
@@ -106,7 +123,7 @@ export const updateUser = async(req, res) => {
                 id : req.userId
             }
     });
-    if(!user) return res.status(404).json({message: "User tidak ditemukan"});
+    if(!user) return MelocalException(res, 400, 'user tidak ditemukan', StatusResponse.ERROR, null)
     const {nama, email, no_telp, password, melocal_points} = req.body;
     let hashPassword;
     if(password === "" || password === null){
@@ -129,11 +146,9 @@ export const updateUser = async(req, res) => {
         });
       
         const response = {nama, email, no_telp, melocal_points, role: user.role}
-        res.status(201).json(response);
+        return MelocalException(res, 200, 'user berhasil diupdate', StatusResponse.SUCCESS, response)
     } catch (error) {
-        res.status(400).json({
-            message: error.message
-        });
+        return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
     }
 }
 
@@ -143,17 +158,15 @@ export const deleteUser = async(req, res) => {
                 id : req.params.userId
             }
     });
-    if(!user) return res.status(404).json({message: "User tidak ditemukan"});
+    if(!user) return MelocalException(res, 400, 'user tidak ditemukan', StatusResponse.ERROR, null)
     try {
         await Users.destroy({
             where:{
                 id: user.id
             }
         });
-        res.status(200).json({message: "User Berhasil di Delete"});
+        return MelocalException(res, 200, 'user berhasil dihapus', StatusResponse.SUCCESS, null)
     } catch (error) {
-        res.status(400).json({
-            message: error.message
-        });
+        return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
     }
 }
