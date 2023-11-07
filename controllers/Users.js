@@ -1,6 +1,7 @@
 import Users from "../models/UserModel.js";
 import argon2 from "argon2";
 import { MelocalException, StatusResponse } from "../utils/Response.js";
+import { Role } from "../constants/Constants.js";
 
 
 export const getUsers = async(req, res) => {
@@ -63,7 +64,7 @@ export const createUser = async(req, res) => {
           no_telp: no_telp,
           password: hashPassword,
           melocal_points: 0,
-          role: 'user'
+          role: Role.USER
       });
         
       const data = {
@@ -71,7 +72,7 @@ export const createUser = async(req, res) => {
         email: email,
         no_telp: no_telp,
         melocal_points: 0,
-        role: 'user'
+        role: Role.USER
       }
       
       return MelocalException(res, 201, 'register berhasil', StatusResponse.SUCCESS, data)
@@ -101,7 +102,7 @@ export const createUserMitra = async(req, res) => {
             no_telp: no_telp,
             password: hashPassword,
             melocal_points: 0,
-            role: 'mitra'
+            role: Role.MITRA
         });
         
         const data = {
@@ -109,7 +110,7 @@ export const createUserMitra = async(req, res) => {
           email: email,
           no_telp: no_telp,
           melocal_points: 0,
-          role: 'mitra'
+          role: Role.MITRA
         }
         return MelocalException(res, 201, 'register berhasil', StatusResponse.SUCCESS, data)
     } catch (error) {

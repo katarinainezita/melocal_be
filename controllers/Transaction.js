@@ -1,274 +1,299 @@
 import Transactions from "../models/TransactionModel.js";
 import Users from "../models/UserModel.js";
 import Sesis from "../models/SesiModel.js";
-import { Op, Sequelize } from "sequelize";
-import fetch from "node-fetch";
-import nodemailer from "nodemailer";
-import { google } from "googleapis";
-
-export const getTransactions = async (req, res) => {
-  const { userId } = req.params;
-  try {
-    let response;
-    if (req.role === "admin") {
-      response = await Transactions.findAll({
-        attributes: [
-          "id",
-          "waktu",
-          "metode_pembayaran",
-          "harga_total",
-          "status",
-        ],
-        include: [
-          {
-            model: Users,
-            attributes: ["nama", "email"],
-          },
-        ],
-      });
-    } else {
-      // response = await Transactions.findAll({
-      //     attributes:['id', 'waktu', 'metode_pembayaran', 'harga_total', 'status'],
-      //     where:{
-      //         userId: userId
-      //     },
-      //     include:[{
-      //         model: Users,
-      //         attributes:['nama','email']
-      //     }]
-      // });
-      const sequelize = new Sequelize("melocaldb", "root", "", {
-        host: "localhost",
-        dialect: "mysql",
-      });
-
-      const query = `
-                SELECT transactions.id, transactions.waktu, transactions.metode_pembayaran, transactions.harga_total,
-                transactions.status, transactions.slot_dibeli, sesis.nama AS sesi_nama, sesis.tanggal, sesis.slot_booked,
-                activities.nama, activities.harga, activities.lokasi FROM transactions JOIN sesis
-                ON transactions.sesisId = sesis.id JOIN activities ON sesis.activityId = activities.id
-                WHERE transactions.userId = ${userId}
-            `;
-
-      response = await sequelize.query(query, {
-        replacements: { userId }, // Pass userId as a replacement to prevent SQL injection
-        type: Sequelize.QueryTypes.SELECT, // Specify the query type
-      });
-    }
-    res.status(200).json(response);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const getTransactionById = async (req, res) => {
-  try {
-    const transaction = await Transactions.findOne({
-      where: {
-        id: req.params.id,
-      },
-    });
-    if (!transaction)
-      return res.status(404).json({ message: "Data tidak ditemukan" });
-    let response;
-    if (req.role === "admin") {
-      response = await Transactions.findOne({
-        attributes: [
-          "id",
-          "waktu",
-          "metode_pembayaran",
-          "harga_total",
-          "status",
-        ],
-        where: {
-          id: transaction.id,
-        },
-        include: [
-          {
-            model: Users,
-            attributes: ["nama", "email"],
-          },
-        ],
-      });
-    } else {
-      response = await Transactions.findOne({
-        attributes: [
-          "id",
-          "waktu",
-          "metode_pembayaran",
-          "harga_total",
-          "status",
-        ],
-        where: {
-          [Op.and]: [{ id: transaction.id }, { userId: req.userId }],
-        },
-        include: [
-          {
-            model: Users,
-            attributes: ["nama", "email"],
-          },
-        ],
-      });
-    }
-    res.status(200).json(response);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const getPendingTransactions = async (req, res) => {
-  const { userId } = req.params;
-  try {
-    const sequelize = new Sequelize("melocaldb", "root", "", {
-      host: "localhost",
-      dialect: "mysql",
-    });
-
-    const query = `
-            SELECT transactions.id AS id_tr, transactions.waktu, transactions.status, transactions.slot_dibeli, sesis.id AS id_sesi,
-            sesis.nama AS nama_sesi, sesis.tanggal AS tanggal_sesi, sesis.slot_maks, sesis.slot_booked, activities.nama,
-            activities.harga, activities.lokasi FROM transactions JOIN sesis ON
-            transactions.sesisId = sesis.id JOIN activities ON sesis.activityId = activities.id
-            WHERE transactions.status LIKE 'menunggu verifikasi' AND activities.userId = ${userId}
-        `;
-
-    let response = await sequelize.query(query, {
-      replacements: { userId }, // Pass userId as a replacement to prevent SQL injection
-      type: Sequelize.QueryTypes.SELECT, // Specify the query type
-    });
-
-    res.status(200).json(response);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+import Activities from "../models/ActivityModel.js";
+import { MelocalException, StatusResponse } from "../utils/Response.js";
+import { MelocalMail } from "../utils/SMTPEmail.js";
+import { Role, StatusPembayaran } from "../constants/Constants.js";
 
 export const createTransaction = async (req, res) => {
-  const { metode_pembayaran, harga_total, slot_dibeli, sesisId } = req.body;
-  const { userId } = req.params;
-  console.log(req.body);
+  let { metode_pembayaran, harga_total, slot_dibeli, sesis_id } = req.body;
+  slot_dibeli = parseInt(slot_dibeli)
   try {
+    const user = await Users.findOne({
+      where: {
+        id: req.userId,
+      },
+    });
+
+    if (!user) return MelocalException(res, 400, "user tidak ditemukan", StatusResponse.ERROR, null)
+    
+    const sesis = await Sesis.findOne({
+      where: {
+        id: sesis_id,
+      },
+    });
+
+    if (!sesis) return MelocalException(res, 400, "sesi tidak ditemukan", StatusResponse.ERROR, null)
+
+    const count = sesis.slot_maks - sesis.slot_booked // 10 - 5 = 5 + 4 = 9
+    if (count < slot_dibeli) return MelocalException(res, 400, "slot yang anda beli telah melewati batas", StatusResponse.ERROR, null)
+
     const transaction = await Transactions.create({
       metode_pembayaran: metode_pembayaran,
       harga_total: harga_total,
-      status: "menunggu verifikasi",
-      userId: userId,
-    });
-    if (transaction) {
-      const user = await Users.findByPk(userId);
+      userId: user.id,
+      status: StatusPembayaran.MENUNGGU_VERIFIKASI,
+      sesisId: sesis_id, 
+      slot_dibeli: slot_dibeli,
+    })
 
-      let transporter = nodemailer.createTransport({
-        service: "gmail",
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.MAIL_USERNAME,
-          pass: process.env.MAIL_PASSWORD,
-        },
-      });
-      let mailOptions = {
-        from: "Melocal <melocal@gmail.com>",
-        to: "ferzanoveri@gmail.com",
-        subject: "Nodemailer Project",
-        text: "Hi from your nodemailer project",
-      };
+    if (!transaction) return MelocalException(res, 400, "transaksi gagal", StatusResponse.ERROR, null)
 
-      transporter.sendMail(mailOptions, function (err, data) {
-        if (err) {
-          console.log("Error " + err);
-        } else {
-          console.log("Email sent successfully");
-        }
-      });
-    }
-    res.status(201).json({ message: "Transaction Created Successfully" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const updateVerifyTransaction = async (req, res) => {
-  const { id } = req.params;
-  try {
-    await Transactions.update(
+    await Sesis.update(
       {
-        status: "terverifikasi",
+        slot_booked: sesis.slot_booked + slot_dibeli,
       },
       {
         where: {
-          id: id,
+          id: sesis.id,
         },
       }
     );
-    res.status(200).json({ message: "Transaction Updated Successfully" });
+
+    // send mail to mitra
+    const activityAndMitra = await Activities.findOne({
+      where: {
+        id: sesis.activityId,
+      },
+      include: Users,
+    });
+
+    if (!activityAndMitra) return MelocalException(res, 400, "aktivitas tidak ditemukan", StatusResponse.ERROR, null)
+
+    const data = {
+      email: activityAndMitra.user.email,
+      subject: "transaksi Berhasil",
+      text: `transaksi anda berhasil, silahkan lakukan pembayaran sebesar ${transaction.harga_total} ke rekening 1234567890`,
+    }
+
+    const mailer = MelocalMail(req, res, data)
+    if (!mailer) return MelocalException(res, 400, "email gagal dikirim", StatusResponse.ERROR, null)
+    
+    return MelocalException(res, 200, "transaksi berhasil", StatusResponse.SUCCESS, transaction)
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
   }
 };
 
-export const updateTransaction = async (req, res) => {
+export const getTransactionsSesis = async (req, res) => {
+  try {
+    const sesis = await Sesis.findOne({
+      where: {
+        id: req.params.sesis_id,
+      },
+    });
+
+    if (!sesis) return MelocalException(res, 404, "sesi tidak ditemukan", StatusResponse.ERROR, null)
+
+    const transactions = await Transactions.findAll({
+      where: {
+        sesisId: sesis.id,
+      },
+    });
+
+    if (!transactions) return MelocalException(res, 404, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
+
+    return MelocalException(res, 200, "transaksi berhasil ditemukan", StatusResponse.SUCCESS, transactions)
+  } catch (error) {
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
+  }
+};
+
+export const getTransactionByStatusPending = async (req, res) => {
+  try {
+    const transactions = await Transactions.findAll({
+      where: {
+        status: StatusPembayaran.MENUNGGU_VERIFIKASI
+        ,
+      },
+    });
+
+    if (!transactions) return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
+
+    return MelocalException(res, 200, "transaksi berhasil ditemukan", StatusResponse.SUCCESS, transactions)
+  } catch (error) {
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
+  }
+}
+
+export const getTransactionByStatusSuccess = async (req, res) => {
+  try {
+    const transactions = await Transactions.findAll({
+      where: {
+        status: StatusPembayaran.TERVERIFIKASI,
+      },
+    });
+
+    if (!transactions) return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
+
+    return MelocalException(res, 200, "transaksi berhasil ditemukan", StatusResponse.SUCCESS, transactions)
+  } catch(error) {
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
+  }
+}
+
+export const getTransactionUser = async (req, res) => {
+  try {
+    const transactions = await Transactions.findAll({
+      where: {
+        userId: req.userId,
+      },
+    });
+
+    if (!transactions) return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
+
+    return MelocalException(res, 200, "transaksi berhasil ditemukan", StatusResponse.SUCCESS, transactions)
+  } catch (error) {
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
+  }
+}
+
+export const getDetailTransaction = async (req, res) => {
   try {
     const transaction = await Transactions.findOne({
       where: {
         id: req.params.id,
       },
     });
-    if (!transaction)
-      return res.status(404).json({ message: "Data tidak ditemukan" });
-    const { metode_pembayaran, harga_total, status } = req.body;
-    if (req.role === "admin") {
-      await Activities.update(
-        {
-          metode_pembayaran,
-          harga_total,
-          status,
-        },
-        {
-          where: {
-            id: transaction.id,
-          },
-        }
-      );
-    } else {
-      if (req.userId !== transaction.userId)
-        return res.status(403).json({ message: "Akses terlarang" });
-      await Transactions.update(
-        {
-          metode_pembayaran,
-          harga_total,
-          status,
-        },
-        {
-          where: {
-            [Op.and]: [{ id: transaction.id }, { userId: req.userId }],
-          },
-        }
-      );
-    }
-    res.status(200).json({ message: "Product Updated Successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
 
-export const updateDenyTransaction = async (req, res) => {
-  const { id } = req.params;
-  try {
-    await Transactions.update(
-      {
-        status: "batal",
-      },
-      {
-        where: {
-          id: id,
-        },
-      }
-    );
-    res.status(200).json({ message: "Transaction Updated Successfully" });
+    if (!transaction) return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
+
+    return MelocalException(res, 200, "transaksi berhasil ditemukan", StatusResponse.SUCCESS, transaction)
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
+  }
+}
+
+export const ExampleSendMail = async (req, res) => {
+  const data = {
+      email: user.email,
+      subject: "Transaksi Berhasil",
+      text: `Transaksi anda berhasil, silahkan lakukan pembayaran sebesar ${harga_total} ke rekening 1234567890`,
+    }
+
+    const mailer = MelocalMail(req, res, data)
+    if (!mailer) return MelocalException(res, 400, "email gagal dikirim", StatusResponse.ERROR, null)
+
+    return MelocalException(res, 200, "transaksi berhasil", StatusResponse.SUCCESS, data)
+}
+
+
+export const updateTransaction = async (req, res) => {
+  const { status } = req.body;
+  try {
+    const transaction = await Transactions.findOne({
+      where: {
+        id: req.params.id,
+      },
+      include: Sesis,
+    });
+    if (!transaction)
+      return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
+
+    const user = await Users.findOne({
+      where: {
+        id: req.userId,
+      },
+    });
+    if (!user) return MelocalException(res, 400, "user tidak ditemukan", StatusResponse.ERROR, null)
+
+    const userTransaction = await Users.findOne({
+      where: {
+        id: transaction.userId,
+      },
+    });
+    if (!userTransaction) return MelocalException(res, 400, "kreator user transaksi tidak ditemukan", StatusResponse.ERROR, null)
+
+    if (user.role === Role.USER && transaction.status === StatusPembayaran.MENUNGGU_VERIFIKASI) {
+      if (userTransaction.id !== user.id)
+        return MelocalException(res, 401, "anda tidak memiliki akses", StatusResponse.ERROR, null)
+
+      if (status === StatusPembayaran.BATAL) {
+        await Transactions.update(
+          {
+            status: status,
+          },
+          {
+            where: {
+              id: transaction.id,
+            },
+          }
+        );
+
+        await Sesis.update(
+          {
+            slot_booked: transaction.sesis.slot_booked - transaction.slot_dibeli,
+          },
+          {
+            where: {
+              id: transaction.sesisId,
+            },
+          }
+        );
+
+        const response = {
+          id: transaction.id,
+          status: status,
+        }
+
+        return MelocalException(res, 200, "transaksi berhasil dibatalkan", StatusResponse.SUCCESS, response)
+      }
+    } else if (user.role === Role.MITRA) {
+      if (status === StatusPembayaran.TERVERIFIKASI) {
+        await Transactions.update(
+          {
+            status: status,
+          },
+          {
+            where: {
+              id: transaction.id,
+            },
+          }
+        );
+
+        const response = {
+          id: transaction.id,
+          status: status,
+          bukti_pembayaran: transaction.bukti_pembayaran,
+          slot_dibeli: transaction.slot_dibeli,
+        }
+
+        return MelocalException(res, 200, "transaksi berhasil terverifikasi", StatusResponse.SUCCESS, response)
+      } else if (status === StatusPembayaran.BATAL) {
+        await Transactions.update(
+          {
+            status: status,
+          },
+          {
+            where: {
+              id: transaction.id,
+            },
+          }
+        );
+
+        await Sesis.update(
+          {
+            slot_booked: transaction.sesis.slot_booked - transaction.slot_dibeli,
+          },
+          {
+            where: {
+              id: transaction.sesisId,
+            },
+          }
+        );
+          
+        const response = {
+          id: transaction.id,
+          status: status,
+        }
+
+        return MelocalException(res, 200, "transaksi berhasil dibatalkan", StatusResponse.SUCCESS, response)
+      }
+    } 
+    return MelocalException(res, 401, "anda tidak memiliki akses", StatusResponse.ERROR, null)
+  } catch (error) {
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
   }
 };
 
@@ -280,24 +305,15 @@ export const deleteTransaction = async (req, res) => {
       },
     });
     if (!transaction)
-      return res.status(404).json({ message: "Data tidak ditemukan" });
-    if (req.role === "admin") {
-      await transaction.destroy({
-        where: {
-          id: transaction.id,
-        },
-      });
-    } else {
-      if (req.userId !== transaction.userId)
-        return res.status(403).json({ message: "Akses terlarang" });
-      await Transactions.destroy({
-        where: {
-          [Op.and]: [{ id: transaction.id }, { userId: req.userId }],
-        },
-      });
-    }
-    res.status(200).json({ message: "Product Deleted Successfully" });
+      return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
+    await Transactions.destroy({
+      where: {
+        id: transaction.id,
+      },
+    });
+
+    return MelocalException(res, 200, "transaksi berhasil dihapus", StatusResponse.SUCCESS, null)
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
   }
 };
