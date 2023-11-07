@@ -1,26 +1,27 @@
 import express from "express";
 import {
-    getTransactions,
-    getTransactionById,
     createTransaction,
-    updateVerifyTransaction,
-    updateDenyTransaction,
     updateTransaction,
+    getTransactionByStatusPending,
     deleteTransaction,
-    getPendingTransactions
+    getTransactionsSesis,
+    getDetailTransaction,
+    getTransactionUser,
+    getTransactionByStatusSuccess
 } from "../controllers/Transaction.js";
 
-import { verifyUser, verifyToken } from "../middleware/AuthUser.js";
+import { verifyUser, verifyToken, verifyTokenForMitra } from "../middleware/AuthUser.js";
 
 const router = express.Router();
 
-router.get('/transactions/:userId',verifyToken, getTransactions);
-router.get('/pending_transactions/:userId',verifyToken, getPendingTransactions);
-// router.get('/transactions/:id', verifyUser, getTransactionById);
-router.post('/transactions/:userId',verifyToken, createTransaction);
-// router.patch('/transactions/:id', verifyUser, updateTransaction);
-router.patch('/transactions/:id',verifyToken, updateVerifyTransaction);
-router.patch('/deny_transactions/:id',verifyToken, updateDenyTransaction);
-router.delete('/transactions/:id',verifyToken, verifyUser, deleteTransaction);
+// Fix
+router.post('/transaction', verifyToken, createTransaction);
+router.get('/user/transaction', verifyToken, getTransactionUser);
+router.get('/transaction/:sesis_id', verifyToken, getTransactionsSesis);
+router.get('/transaction/detail/:id', verifyToken, getDetailTransaction)
+router.get('/pending-transaction', verifyTokenForMitra, getTransactionByStatusPending);
+router.get('/success-transaction', verifyTokenForMitra, getTransactionByStatusSuccess);
+router.patch('/transaction/:id', verifyToken, updateTransaction);
+router.delete('/transaction/:id', verifyTokenForMitra, deleteTransaction);
 
 export default router;
