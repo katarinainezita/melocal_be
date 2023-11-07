@@ -19,10 +19,22 @@ const Images = db.define('images', {
       }
     },
     url: {
-      type: DataTypes.TEXT,
-      validate:{
-        isUrl: true
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true
       }
+    }, 
+    types: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true
+      }
+    },
+    key: {
+      type: DataTypes.STRING, 
+      allowNull: false
     }
 }, {
     freezeTableName: true

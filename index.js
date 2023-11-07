@@ -6,6 +6,7 @@ import UserRoute from "./routes/UserRoute.js";
 import ActivityRoute from "./routes/ActivityRoute.js";
 import AuthRoute from "./routes/AuthRoute.js";
 import TransactionRoute from "./routes/TransactionRoute.js";
+import FileRoute from "./routes/FileRoute.js";
 import SesiRoute from "./routes/SesiRoute.js";
 import ImageRoute from "./routes/ImageRoute.js";
 // import CartRoute from "./routes/CartRoute.js";
@@ -42,7 +43,7 @@ app.use(
 app.use(
   cors({
     credentials: true,
-    origin: "http://localhost:3000",
+    origin: "http://localhost:3001",
   })
 );
 
@@ -53,7 +54,7 @@ app.use(AuthRoute);
 app.use(TransactionRoute);
 app.use(SesiRoute);
 app.use(ImageRoute);
-app.use("/uploads", express.static("uploads"));
+app.use(FileRoute)
 // app.use(CartRoute);
 // app.use(DetailRoute);
 
