@@ -17,4 +17,5 @@ const db = new Sequelize(
     dialect: "mysql"
   }
 )
+
 export default db;

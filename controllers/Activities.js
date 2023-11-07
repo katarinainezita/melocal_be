@@ -1,11 +1,13 @@
 import Activities from "../models/ActivityModel.js";
 import Users from "../models/UserModel.js";
+import Images from "../models/ImageModel.js";
 import { Op } from "sequelize";
 import { MelocalException, StatusResponse } from "../utils/Response.js";
+import { TypesImages } from "../constants/Constants.js";
 
 export const getActivities = async(req, res) => {
     try {
-      const response = await Activities.findAll({
+      let activities = await Activities.findAll({
         attributes: ['id', 'nama', 'deskripsi', 'harga', 'fitur', 'bintang', 'lokasi', 'nama_tourguide', 'kontak_tourguide'],
         include: [
           {
@@ -14,6 +16,21 @@ export const getActivities = async(req, res) => {
           }
         ]
       });
+
+      let images;
+      for(const activity of activities) {
+        images = await Images.findAll({
+          attributes: ['id','url'],
+          where: {
+            key: activity.id,
+            types: TypesImages.ACTIVITIES
+          }
+        });
+
+        activity.setDataValue('images', images);
+      }
+
+      const response = activities;
 
       return MelocalException(res, 200, 'activity berhasil ditemukan', StatusResponse.SUCCESS, response)
     } catch (error) {
@@ -33,7 +50,7 @@ export const getActivitiesByMitraId = async (req, res) => {
       return MelocalException(res, 404, 'user tidak ditemukan', StatusResponse.ERROR, null);
     }
 
-    const response = await Activities.findAll({
+    let activities = await Activities.findAll({
       attributes: ['id', 'nama', 'deskripsi', 'harga', 'fitur', 'bintang', 'lokasi', 'nama_tourguide', 'kontak_tourguide'],
       where: {
         userId: user.id
@@ -46,13 +63,29 @@ export const getActivitiesByMitraId = async (req, res) => {
       ]
     });
 
+    if(!activities) return MelocalException(res, 400, 'activity tidak ditemukan', StatusResponse.ERROR, null);
+
+    let images;
+    for(const activity of activities) {
+      images = await Images.findAll({
+        attributes: ['id','url'],
+        where: {
+          key: activity.id,
+          types: TypesImages.ACTIVITIES
+        }
+      });
+
+      activity.setDataValue('images', images);
+    }
+
+    const response = activities;
+
     return MelocalException(res, 200, 'activity berhasil ditemukan', StatusResponse.SUCCESS, response);
   } catch (error) {
     console.log(error);
     return MelocalException(res, 500, error.message, StatusResponse.ERROR, null);
   }
 }
-
 
 export const getActivityById = async(req, res) => {
     try {
@@ -82,6 +115,17 @@ export const getActivityById = async(req, res) => {
                 attributes:['id']
             }]
         });
+        
+        let images = await Images.findAll({
+          attributes: ['id','url'],
+          where: {
+            key: response.id,
+            types: TypesImages.ACTIVITIES
+          }
+        });
+      
+        response.setDataValue('images', images);
+      
         return MelocalException(res, 200, 'activity berhasil ditemukan', StatusResponse.SUCCESS, response)
     } catch (error) {
         return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
@@ -89,25 +133,38 @@ export const getActivityById = async(req, res) => {
 }
 
 export const createActivity = async(req, res) => {
-    const { nama, deskripsi, harga, fitur, lokasi, nama_tourguide, kontak_tourguide} = req.body;
-    try {
-        await Activities.create({
-            nama: nama,
-            deskripsi: deskripsi,
-            harga: harga,
-            fitur: fitur,
-            bintang: 0,
-            lokasi: lokasi,
-            nama_tourguide: nama_tourguide,
-            kontak_tourguide: kontak_tourguide,
-            userId: req.userId
+  const { nama, deskripsi, harga, fitur, lokasi, nama_tourguide, kontak_tourguide } = req.body;
+  const files = req.files
+  try {
+      const data = await Activities.create({
+          nama: nama,
+          deskripsi: deskripsi,
+          harga: harga,
+          fitur: fitur,
+          bintang: 0,
+          lokasi: lokasi,
+          nama_tourguide: nama_tourguide,
+          kontak_tourguide: kontak_tourguide,
+          userId: req.userId
+      });
+    
+      let array_image = [];
+      // Save image to database
+      for (const file of files) {
+        array_image.push(file.filename);
+        await Images.create({
+          nama: file.originalname,
+          url: file.filename,
+          types: TypesImages.ACTIVITIES,
+          key: data.id
         });
+      }
       
-        const response = { nama, deskripsi, harga, fitur, lokasi, nama_tourguide, kontak_tourguide}
-        return MelocalException(res, 200, 'activity berhasil dibuat', StatusResponse.SUCCESS, response)
-    } catch (error) {
-        return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
-    }
+      const response = { nama, deskripsi, harga, fitur, lokasi, nama_tourguide, kontak_tourguide, array_image}
+      return MelocalException(res, 200, 'activity berhasil dibuat', StatusResponse.SUCCESS, response)
+  } catch (error) {
+      return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
+  }
 }
 
 export const updateActivity = async(req, res) => {

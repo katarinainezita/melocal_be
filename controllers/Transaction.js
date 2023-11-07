@@ -4,10 +4,12 @@ import Sesis from "../models/SesiModel.js";
 import Activities from "../models/ActivityModel.js";
 import { MelocalException, StatusResponse } from "../utils/Response.js";
 import { MelocalMail } from "../utils/SMTPEmail.js";
-import { Role, StatusPembayaran } from "../constants/Constants.js";
+import { Role, StatusPembayaran, TypesImages } from "../constants/Constants.js";
+import Images from "../models/ImageModel.js";
 
 export const createTransaction = async (req, res) => {
   let { metode_pembayaran, harga_total, slot_dibeli, sesis_id } = req.body;
+  const file = req.file;
   slot_dibeli = parseInt(slot_dibeli)
   try {
     const user = await Users.findOne({
@@ -34,6 +36,7 @@ export const createTransaction = async (req, res) => {
       harga_total: harga_total,
       userId: user.id,
       status: StatusPembayaran.MENUNGGU_VERIFIKASI,
+      bukti_pembayaran: file ? file.filename : null,
       sesisId: sesis_id, 
       slot_dibeli: slot_dibeli,
     })
@@ -177,7 +180,6 @@ export const ExampleSendMail = async (req, res) => {
 
     return MelocalException(res, 200, "transaksi berhasil", StatusResponse.SUCCESS, data)
 }
-
 
 export const updateTransaction = async (req, res) => {
   const { status } = req.body;

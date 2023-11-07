@@ -19,3 +19,9 @@ export const Role = {
     MITRA: "mitra",
     ADMIN: "admin"
 }
+
+export const TypesImages = {
+  ACTIVITIES: "activities",
+  USERS: "users",
+  BUKTI_PEMBAYARAN: "bukti_pembayaran"
+}

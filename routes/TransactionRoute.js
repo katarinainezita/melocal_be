@@ -11,11 +11,12 @@ import {
 } from "../controllers/Transaction.js";
 
 import { verifyUser, verifyToken, verifyTokenForMitra } from "../middleware/AuthUser.js";
+import { upload } from "../utils/Image.js";
 
 const router = express.Router();
 
 // Fix
-router.post('/transaction', verifyToken, createTransaction);
+router.post('/transaction', upload.single('image'), verifyToken, createTransaction);
 router.get('/user/transaction', verifyToken, getTransactionUser);
 router.get('/transaction/:sesis_id', verifyToken, getTransactionsSesis);
 router.get('/transaction/detail/:id', verifyToken, getDetailTransaction)
