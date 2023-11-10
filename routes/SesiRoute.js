@@ -15,7 +15,7 @@ const router = express.Router();
 router.get('/sesis/activites/:id', getSesiByActivitesId);
 router.get('/sesis/:id', verifyToken, getSesiById);
 router.post('/sesis', verifyTokenForMitra, createSesi);
-router.patch('/sesis/:id', verifyTokenForMitra, updateSesi);
+router.put('/sesis/:id', verifyTokenForMitra, updateSesi);
 router.delete('/sesis/:id', verifyTokenForMitra, deleteSesi);
 
 export default router;

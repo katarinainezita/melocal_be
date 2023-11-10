@@ -17,7 +17,7 @@ router.get('/users/:id', verifyToken, getUserById); // Harusnya buat admin dan m
 // router.get('/users/:email', verifyUser, verifyToken, adminOnly, getUserByEmail); // role admin
 router.post('/users', createUser);
 router.post('/mitra', createUserMitra);
-router.patch('/users', verifyToken, updateUser);
+router.put('/users', verifyToken, updateUser);
 router.delete('/users/:userId', verifyTokenForMitra, deleteUser); //role admin
 
 export default router;

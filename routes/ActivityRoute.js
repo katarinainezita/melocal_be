@@ -17,7 +17,7 @@ router.get('/activities', getActivities);
 router.get('/activities/:id', verifyToken, getActivityById);
 router.get('/mitra/activities', verifyTokenForMitra, getActivitiesByMitraId)
 router.post('/activities', upload.array('images'), verifyTokenForMitra, createActivity); // ada user id param
-router.patch('/activities/:id', verifyTokenForMitra, updateActivity);
+router.put('/activities/:id', verifyTokenForMitra, updateActivity);
 router.delete('/activities/:id', verifyTokenForMitra, deleteActivity);
 
 export default router;

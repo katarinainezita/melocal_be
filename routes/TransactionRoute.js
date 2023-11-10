@@ -22,7 +22,7 @@ router.get('/transaction/:sesis_id', verifyToken, getTransactionsSesis);
 router.get('/transaction/detail/:id', verifyToken, getDetailTransaction)
 router.get('/pending-transaction', verifyTokenForMitra, getTransactionByStatusPending);
 router.get('/success-transaction', verifyTokenForMitra, getTransactionByStatusSuccess);
-router.patch('/transaction/:id', verifyToken, updateTransaction);
+router.put('/transaction/:id', verifyToken, updateTransaction);
 router.delete('/transaction/:id', verifyTokenForMitra, deleteTransaction);
 
 export default router;
