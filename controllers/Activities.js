@@ -212,8 +212,6 @@ export const deleteActivityImage = async (req, res) => {
       }
     });
 
-    console.log(req.params.image_id);
-
     if (!image) return MelocalException(res, 400, 'data image tidak ditemukan', StatusResponse.ERROR, null)
 
     await Images.destroy({
