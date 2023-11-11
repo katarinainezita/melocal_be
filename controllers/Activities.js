@@ -4,6 +4,7 @@ import Images from "../models/ImageModel.js";
 import { Op } from "sequelize";
 import { MelocalException, StatusResponse } from "../utils/Response.js";
 import { TypesImages } from "../constants/Constants.js";
+import { deleteImage } from  "../utils/Image.js";
 
 export const getActivities = async(req, res) => {
     try {
@@ -165,6 +166,69 @@ export const createActivity = async(req, res) => {
   } catch (error) {
       return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
   }
+}
+
+export const createActivityImage = async (req, res) => {
+  const file = req.file;
+  try {
+    if (!file) return MelocalException(res, 400, 'file tidak ditemukan', StatusResponse.ERROR, null)
+
+    const activities = await Activities.findOne({
+      where: {
+        id: req.params.id
+      }
+    });
+
+    if (!activities) return MelocalException(res, 400, 'data activity tidak ditemukan', StatusResponse.ERROR, null)
+
+    const Image = await Images.create({
+      nama: file.originalname,
+      url: file.filename,
+      types: TypesImages.ACTIVITIES,
+      key: activities.id
+    });
+
+    const response = Image;
+
+    return MelocalException(res, 200, 'image berhasil dibuat', StatusResponse.SUCCESS, response)
+  } catch (error) {
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
+  }
+}
+
+export const deleteActivityImage = async (req, res) => {
+  try {
+    const activity = await Activities.findOne({
+      where: {
+        id: req.params.id
+      }
+    });
+
+    if (!activity) return MelocalException(res, 400, 'data activity tidak ditemukan', StatusResponse.ERROR, null)
+
+    const image = await Images.findOne({
+      where: {
+        id: req.params.image_id
+      }
+    });
+
+    console.log(req.params.image_id);
+
+    if (!image) return MelocalException(res, 400, 'data image tidak ditemukan', StatusResponse.ERROR, null)
+
+    await Images.destroy({
+      where: {
+        id: image.id
+      }
+    });
+
+    deleteImage(image.url);
+
+    return MelocalException(res, 200, 'image berhasil dihapus', StatusResponse.SUCCESS, null)
+  } catch (error) {
+    return MelocalException(res, 500, error.message, StatusResponse.ERROR, null)
+  }
+
 }
 
 export const updateActivity = async(req, res) => {

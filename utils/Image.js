@@ -1,5 +1,6 @@
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
 const storage = multer.diskStorage({
@@ -16,4 +17,14 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-export { upload };
+const deleteImage = (del) => {
+  const data = 'uploads/' + del;
+  fs.unlink(data, (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+  });
+}
+
+export { upload, deleteImage };
