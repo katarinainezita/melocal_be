@@ -107,10 +107,27 @@ export const getTransactionByStatusPending = async (req, res) => {
   try {
     const transactions = await Transactions.findAll({
       where: {
-        status: StatusPembayaran.MENUNGGU_VERIFIKASI
-        ,
+        status: StatusPembayaran.MENUNGGU_VERIFIKASI,
       },
+      include: [
+        Sesis,
+      ]
     });
+
+    if (!transactions) return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
+
+    for (const data of transactions) {
+      const activity = await Activities.findOne({
+        where: {
+          id: data.sesis.activityId,
+        },
+        include: [
+          Images
+        ]
+      });
+
+      data.setDataValue('activity', activity)
+    }
 
     if (!transactions) return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
 
@@ -126,7 +143,25 @@ export const getTransactionByStatusSuccess = async (req, res) => {
       where: {
         status: StatusPembayaran.TERVERIFIKASI,
       },
+      include: [
+        Sesis,
+      ]
     });
+
+    if (!transactions) return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
+
+    for (const data of transactions) {
+      const activity = await Activities.findOne({
+        where: {
+          id: data.sesis.activityId,
+        },
+        include: [
+          Images
+        ]
+      });
+
+      data.setDataValue('activity', activity)
+    }
 
     if (!transactions) return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
 
@@ -142,7 +177,25 @@ export const getTransactionUser = async (req, res) => {
       where: {
         userId: req.userId,
       },
+      include: [
+        Sesis,
+      ]
     });
+
+    if(!transactions) return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
+
+    for (const data of transactions) {
+      const activity = await Activities.findOne({
+        where: {
+          id: data.sesis.activityId,
+        },
+        include: [
+          Images
+        ]
+      });
+
+      data.setDataValue('activity', activity)
+    }
 
     if (!transactions) return MelocalException(res, 400, "transaksi tidak ditemukan", StatusResponse.ERROR, null)
 
